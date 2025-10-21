@@ -1,0 +1,153 @@
+/* Shared Component Styles */
+/* Common patterns used across multiple components */
+
+/* ============================================================================
+   LOADING PATTERNS
+   ============================================================================ */
+
+.SharedLoadingContainer {
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-2xl);
+  border: var(--border-width-thick) solid var(--color-border-tertiary);
+  text-align: center;
+}
+
+.SharedLoadingText {
+  color: var(--color-brand-primary);
+  font-family: var(--font-family-mono);
+  letter-spacing: var(--space-xs);
+}
+
+/* ============================================================================
+   CONTAINER PATTERNS
+   ============================================================================ */
+
+.SharedContainer {
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-md);
+  border: var(--border-width-thick) solid var(--color-border-tertiary);
+}
+
+@media (min-width: 640px) {
+  .SharedContainer {
+    padding: var(--space-xl);
+  }
+}
+
+@media (min-width: 768px) {
+  .SharedContainer {
+    padding: var(--space-2xl);
+  }
+}
+
+/* ============================================================================
+   TITLE PATTERNS
+   ============================================================================ */
+
+.SharedTitle {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand-primary);
+  text-transform: uppercase;
+  letter-spacing: var(--space-xs);
+  font-size: 1rem;
+  margin-bottom: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .SharedTitle {
+    font-size: 1.125rem;
+    margin-bottom: var(--space-xl);
+  }
+}
+
+/* ============================================================================
+   SECTION PATTERNS
+   ============================================================================ */
+
+.Section {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: var(--border-width-thick) solid var(--color-border-tertiary);
+}
+
+.PreviewSection {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-xl);
+}
+
+/* ============================================================================
+   PREVIEW CONTAINERS
+   ============================================================================ */
+
+.PreviewContainer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.PreviewContainerScrollable {
+  overflow-x: auto;
+}
+
+/* ============================================================================
+   PREVIEW BOX PATTERNS - Bordered boxes for asset previews
+   ============================================================================ */
+
+.SharedPreviewBox {
+  background-color: var(--color-bg-secondary);
+  border: var(--border-width-thick) solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .SharedPreviewBox {
+    padding: var(--space-xl);
+  }
+}
+
+@media (min-width: 768px) {
+  .SharedPreviewBox {
+    padding: var(--space-2xl);
+  }
+}
+
+/* Preview Box Title - styled for asset preview headings */
+.SharedPreviewTitle {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand-primary);
+  text-transform: uppercase;
+  margin-bottom: var(--space-md);
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .SharedPreviewTitle {
+    font-size: 1.125rem;
+    margin-bottom: var(--space-xl);
+  }
+}
+
+/* ============================================================================
+   RESPONSIVE SPACING ADJUSTMENTS
+   ============================================================================ */
+
+@media (min-width: 640px) {
+  .Section {
+    margin-top: var(--space-2xl);
+  }
+
+  .PreviewSection {
+    margin-bottom: var(--space-2xl);
+  }
+}

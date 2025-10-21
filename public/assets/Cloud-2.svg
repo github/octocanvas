@@ -1,0 +1,9 @@
+<svg width="195" height="102" viewBox="0 0 195 102" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="cloud2Gradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#7EC8FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3094FF;stop-opacity:0.6" />
+    </radialGradient>
+  </defs>
+  <ellipse cx="97.7349" cy="51.1485" rx="96.8655" ry="50.2266" transform="rotate(-0.129278 97.7349 51.1485)" fill="url(#cloud2Gradient)"/>
+</svg>

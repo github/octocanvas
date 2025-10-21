@@ -1,0 +1,26 @@
+/* ReadmeBanner Component Styles */
+
+/* Use shared styles from shared.module.css for common patterns:
+ * - SharedContainer for BannerSection styling
+ * - SharedTitle for consistent title styling
+ */
+
+/* Component-specific layout containers */
+.Container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.ContentSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* Preview Container */
+.PreviewContainer {
+  overflow-x: auto;
+  max-width: 1280px;
+  width: 100%;
+}

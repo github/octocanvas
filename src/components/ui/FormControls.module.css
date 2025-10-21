@@ -1,0 +1,346 @@
+/*
+ * Primer Brand Form Controls CSS
+ * Adapted from @primer/react-brand component styles
+ */
+
+/* Local aliases using global design system variables */
+:root {
+  /* Control Colors - (mostly) using global color system */
+  --primer-control-checkbox-bg-default: var(--color-input-bg);
+  --primer-control-checkbox-bg-checked: var(--color-brand-primary);
+  --primer-control-checkbox-bg-disabled: var(--color-text-disabled);
+  --primer-control-checkbox-border-default: var(--color-input-border);
+  --primer-control-checkbox-border-checked: var(--color-brand-primary);
+  --primer-control-checkbox-fg-checked: var(--color-text-inverse);
+
+  --primer-control-text-bg-default: var(--color-input-bg);
+  --primer-control-text-border-default: var(--color-input-border);
+  --primer-control-text-fg-default: var(--color-input-text);
+  --primer-control-text-fg-disabled: var(--color-text-disabled);
+  --primer-control-text-bg-disabled: #161b22;
+  --primer-control-text-border-disabled: var(--color-input-border);
+
+  /* Select specific variables */
+  --primer-control-select-bg-default: var(--color-input-bg);
+  --primer-control-select-fg-default: var(--color-input-text);
+  --primer-control-select-border-default: var(--color-input-border);
+  --primer-control-select-fg-disabled: var(--color-text-disabled);
+  --primer-control-select-bg-disabled: #161b22;
+
+  /* Border Radius - using global radius system */
+  --primer-border-radius-small: var(--border-radius-sm);
+  --primer-border-radius-medium: var(--border-radius-md);
+
+  /* Animation - using global timing system */
+  --primer-control-animation-duration: 0.35s;
+  --primer-control-animation-easing: var(--transition-easing-smooth);
+}
+
+/* Checkbox Styles */
+.checkbox-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox {
+  align-items: center;
+  background-color: var(--primer-control-checkbox-bg-default);
+  border: var(--border-width-thick) solid
+    var(--primer-control-checkbox-border-default);
+  border-radius: var(--primer-border-radius-small);
+  cursor: pointer;
+  display: inline-flex;
+  height: 20px;
+  justify-content: center;
+  margin: 3px 0;
+  transition: all var(--primer-control-animation-duration)
+    var(--primer-control-animation-easing);
+  width: 20px;
+  outline: none;
+  box-shadow: 0 0 0 3px transparent;
+  position: relative;
+}
+
+.checkbox-input {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.checkbox-checkmark {
+  height: 16px;
+  width: 16px;
+  opacity: 0;
+}
+
+.checkbox-checkmark path {
+  stroke: var(--primer-control-checkbox-fg-checked);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Checkbox States */
+.checkbox-input:checked + .checkbox {
+  background-color: var(--primer-control-checkbox-bg-checked);
+  border-color: var(--primer-control-checkbox-border-checked);
+}
+
+.checkbox-input:checked + .checkbox .checkbox-checkmark {
+  opacity: 1;
+}
+
+.checkbox-input:focus:focus-visible + .checkbox {
+  outline: 1px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.checkbox-input:disabled + .checkbox {
+  background-color: var(--primer-control-checkbox-bg-disabled);
+  border-color: var(--primer-control-text-border-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Text Input Styles */
+.textinput-wrapper {
+  position: relative;
+  display: inline-flex;
+  border: 1px solid var(--primer-control-text-border-default);
+  border-radius: var(--primer-border-radius-medium);
+  transition: var(--primer-control-animation-duration)
+    var(--primer-control-animation-easing);
+  transition-property: border-color, box-shadow;
+  width: 100%;
+}
+
+.textinput-wrapper--medium {
+  height: 48px;
+}
+
+.textinput-wrapper--large {
+  height: 56px;
+}
+
+.textinput {
+  display: flex;
+  width: 100%;
+  color: var(--primer-control-text-fg-default);
+  background-color: var(--primer-control-text-bg-default);
+  border: none;
+  border-radius: var(--primer-border-radius-medium);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: var(--space-sm) var(--space-md);
+  transition: var(--primer-control-animation-duration)
+    var(--primer-control-animation-easing);
+  transition-property: color, background-color, box-shadow;
+  outline: none;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.textinput::placeholder {
+  color: var(--color-input-placeholder);
+  opacity: 1;
+}
+
+.textinput:disabled {
+  color: var(--primer-control-text-fg-disabled);
+  background-color: var(--primer-control-text-bg-disabled);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.textinput-wrapper:focus-within {
+  border-color: var(--color-input-border-focus);
+  box-shadow: 0 0 0 1px var(--color-input-border-focus);
+}
+
+.textinput-wrapper--disabled {
+  border-color: var(--primer-control-text-border-disabled);
+}
+
+.textinput-wrapper--error {
+  border-color: var(--color-error);
+}
+
+.errorMessage {
+  color: var(--color-error);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.formControlWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.textinput-wrapper--success {
+  border-color: var(--color-brand-primary);
+}
+
+/* Select Styles */
+.select-wrapper {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: minmax(0, auto) 16px;
+  border: 1px solid var(--primer-control-select-border-default);
+  border-radius: var(--primer-border-radius-medium);
+  transition: var(--primer-control-animation-duration)
+    var(--primer-control-animation-easing);
+  transition-property: border-color, box-shadow;
+  font-family: inherit;
+  width: 100%;
+}
+
+.select-wrapper--medium select {
+  height: 48px;
+}
+
+.select-wrapper--large select {
+  height: 56px;
+}
+
+.select-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  background-color: var(--primer-control-select-fg-default);
+  mask: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0iIzU4NjA2OSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC40MjcgOS40MjdsMy4zOTYgMy4zOTZhLjI1MS4yNTEgMCAwMC4zNTQgMGwzLjM5Ni0zLjM5NkEuMjUuMjUgMCAwMDExLjM5NiA5SDQuNjA0YS4yNS4yNSAwIDAwLS4xNzcuNDI3ek00LjQyMyA2LjQ3TDcuODIgMy4wNzJhLjI1LjI1IDAgMDEuMzU0IDBMMTEuNTcgNi40N2EuMjUuMjUgMCAwMS0uMTc3LjQyN0g0LjZhLjI1LjI1IDAgMDEtLjE3Ny0uNDI3eiIgLz48L3N2Zz4=);
+  -webkit-mask: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0iIzU4NjA2OSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC40MjcgOS40MjdsMy4zOTYgMy4zOTZhLjI1MS4yNTEgMCAwMC4zNTQgMGwzLjM5Ni0zLjM5NkEuMjUuMjUgMCAwMDExLjM5NiA5SDQuNjA0YS4yNS4yNSAwIDAwLS4xNzcuNDI3ek00LjQyMyA2LjQ3TDcuODIgMy4wNzJhLjI1LjI1IDAgMDEuMzU0IDBMMTEuNTcgNi40N2EuMjUuMjUgMCAwMS0uMTc3LjQyN0g0LjZhLjI1LjI1IDAgMDEtLjE3Ny0uNDI3eiIgLz48L3N2Zz4=);
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  grid-column: 2;
+  grid-row: 1;
+  place-self: center flex-end;
+}
+
+.select-wrapper--medium::after {
+  margin-inline-end: var(--space-xs);
+}
+
+.select-wrapper--large::after {
+  margin-inline-end: var(--space-xs);
+}
+
+.select {
+  appearance: none;
+  color: var(--primer-control-select-fg-default);
+  cursor: pointer;
+  background-color: var(--primer-control-select-bg-default);
+  border: none;
+  border-radius: var(--primer-border-radius-medium);
+  line-height: 1.5;
+  transition: var(--primer-control-animation-duration)
+    var(--primer-control-animation-easing);
+  transition-property: color, background-color, box-shadow, border-color;
+  width: 100%;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  outline: none;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.select--medium {
+  font-weight: 400;
+  font-size: 16px;
+  padding: var(--space-sm) var(--space-2xl) var(--space-sm) var(--space-md);
+}
+
+.select--large {
+  font-weight: 500;
+  font-size: 18px;
+  padding: 14px var(--space-2xl) 14px var(--space-lg);
+}
+
+.select::placeholder {
+  color: #8c959f;
+  opacity: 1;
+}
+
+.select:focus {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 2px var(--color-focus);
+}
+
+.select:disabled {
+  color: var(--primer-control-select-fg-disabled);
+  background-color: var(--primer-control-select-bg-disabled);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.select-wrapper:focus-within {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 1px var(--color-focus);
+}
+
+.select-wrapper--disabled {
+  border-color: var(--primer-control-text-border-disabled);
+}
+
+.select-wrapper--disabled::after {
+  background-color: var(--primer-control-select-fg-disabled);
+}
+
+.select-wrapper--error {
+  border-color: #d1242f;
+}
+
+.select-wrapper--success {
+  border-color: #1f883d;
+}
+
+.select-wrapper--fullWidth {
+  width: 100%;
+}
+
+/* Label Styles */
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primer-control-text-fg-default);
+  margin-bottom: var(--space-xs);
+  line-height: 1.5;
+}
+
+.label--disabled {
+  color: var(--primer-control-text-fg-disabled);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .checkbox,
+  .textinput-wrapper,
+  .textinput,
+  .checkbox-checkmark,
+  .select-wrapper,
+  .select {
+    animation: none !important;
+    transition: none !important;
+  }
+}
