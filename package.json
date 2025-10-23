@@ -9,7 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^3.5.4",
+    "@astrojs/preact": "^4.1.1",
     "@astrojs/tailwind": "^5.1.2",
     "@primer/react-brand": "^0.58.2",
     "astro": "^5.14.8",
@@ -22,6 +22,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
-    "vite": "^7.0.8"
+    "vite": "^7.1.11"
   }
 }
