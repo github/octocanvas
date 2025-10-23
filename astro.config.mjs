@@ -14,8 +14,8 @@ export default defineConfig({
 
   // GitHub Pages deployment configuration
   // Set the base to your repository name for GitHub Pages
-  site: SITE || 'https://githubuniverse.github.io',
-  base: BASE_URL || '/octocanvas',
+  site: SITE || 'https://octocanvas.io',
+  base: BASE_URL || '/',
 
   // Integrations
   integrations: [
