@@ -9,10 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^3.5.3",
+    "@astrojs/preact": "^3.5.4",
     "@astrojs/tailwind": "^5.1.2",
     "@primer/react-brand": "^0.58.2",
-    "astro": "^5.14.1",
+    "astro": "^5.14.8",
     "framer-motion": "^11.11.17",
     "html2canvas": "^1.4.1",
     "preact": "^10.24.3",
@@ -22,6 +22,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
-    "vite": "^6.4.1"
+    "vite": "^7.0.8"
   }
 }
