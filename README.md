@@ -329,9 +329,13 @@ Contributions are welcome! Here are some ways you can contribute:
 - Enhance SVG designs
 - Add animations or effects
 
-## 📝 License
+## License 
 
-MIT License - feel free to use this project for personal or commercial purposes.
+This project is licensed under the terms of the MIT open source license. Please refer to the [LICENSE](./LICENSE) file for the full terms.
+
+## Maintainers 
+
+@Damovisa @jldeen
 
 ## 🙏 Acknowledgments
 
