@@ -32,9 +32,6 @@ jobs:
         run: npm ci
       
       - name: Build site
-        env:
-          SITE: ${{ github.event.repository.owner.html_url }}
-          BASE_URL: /${{ github.event.repository.name }}
         run: npm run build
       
       - name: Upload artifact
