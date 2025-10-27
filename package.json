@@ -1,0 +1,27 @@
+{
+  "name": "github-wallpaper-generator",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/preact": "^4.1.1",
+    "@astrojs/tailwind": "^5.1.2",
+    "@primer/react-brand": "^0.58.2",
+    "astro": "^5.14.8",
+    "framer-motion": "^11.11.17",
+    "html2canvas": "^1.4.1",
+    "preact": "^10.24.3",
+    "react": "^19.2.0",
+    "react-social-icons": "^6.25.0",
+    "tailwindcss": "^3.4.17"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "vite": "^7.1.11"
+  }
+}

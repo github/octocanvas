@@ -1,0 +1,119 @@
+/* ActionButtonsArea Component Styles */
+
+/* Wallpaper Actions */
+.WallpaperActions {
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}
+
+@media (min-width: 640px) {
+  .WallpaperActions {
+    gap: var(--space-lg);
+  }
+}
+
+.WallpaperSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 640px) {
+  .WallpaperSection {
+    gap: var(--space-md);
+  }
+}
+
+.WallpaperGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xs);
+}
+
+@media (min-width: 640px) {
+  .WallpaperGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+}
+
+@media (min-width: 768px) {
+  .WallpaperGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.WallpaperButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.WallpaperButtonTitle {
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+@media (min-width: 640px) {
+  .WallpaperButtonTitle {
+    font-size: 14px;
+  }
+}
+
+.WallpaperButtonSubtitle {
+  font-size: 12px;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: var(--space-2xs);
+}
+
+/* Devemon and Banner Actions */
+.ActionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  pointer-events: auto;
+}
+
+.ActionsRow {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+/* Social Icons */
+.SocialIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Social Share Row */
+.SocialShareRow {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+  .SocialShareRow {
+    gap: var(--space-md);
+  }
+}
+
+/* Action Area Container */
+.ActionArea {
+  position: relative;
+  z-index: 20;
+  padding-bottom: var(--space-xl);
+}
+
+@media (min-width: 640px) {
+  .ActionArea {
+    padding-bottom: var(--space-2xl);
+  }
+}

@@ -1,0 +1,426 @@
+/**
+ * GitHub Universe 2025 Design System
+ * Global styles and font imports from Figma design specifications
+ *
+ * Font Strategy:
+ * - Mona Sans: Available via Fontshare (GitHub's official distribution)
+ * - Monaspace: Available via GitHub Fonts or CDN Fonts
+ *
+ * Note: For production, consider hosting fonts locally for better performance
+ * and to comply with GitHub's font licensing terms.
+ */
+
+/*
+ * Font Imports
+ * Using publicly available CDN sources
+ * IMPORTANT: @import must come before @tailwind directives
+ */
+
+/* Mona Sans - Primary body and UI text (via Fontshare - official source) */
+@import url("https://api.fontshare.com/v2/css?f[]=mona-sans@400,500,600&display=swap");
+@import '@primer/react-brand/fonts/fonts.css';
+@import '@primer/react-brand/lib/css/main.css';
+
+/* Monaspace Neon - Monospace for actions, labels (local file) */
+@font-face {
+  font-family: 'Monaspace Neon';
+  src: url('/octocanvas/assets/MonaspaceNeonVarVF.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  /* Variable font weight range */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Scroll-driven animations */
+@keyframes hero-shrink {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(0.7);
+    opacity: 0.8;
+  }
+}
+
+#hero-title {
+  animation: hero-shrink linear;
+  animation-timeline: scroll(root);
+  /* stylelint-disable-next-line property-no-unknown */
+  animation-range: 0% 50%;
+  transform-origin: center;
+}
+
+/* Fallback for browsers that don't support scroll-driven animations */
+@supports not (animation-timeline: scroll()) {
+  #hero-title {
+    animation: none;
+  }
+
+  /* Alternative JavaScript-based scroll effect could be added here */
+  @media (prefers-reduced-motion: no-preference) {
+    #hero-title {
+      transition: transform 0.3s ease-out;
+    }
+  }
+}
+
+/* CSS Custom Properties for Design Tokens */
+:root {
+  /* === CORE BRAND COLORS === */
+  /* Primary Brand Colors */
+  --color-brand-primary: #5fed83;
+  --color-brand-dark: #12662a;
+  --color-brand-light: #80f29d;
+  --color-brand-pale: #bfffd1;
+
+  /* Background System */
+  --color-bg-primary: #010409;
+  --color-bg-secondary: #101411;
+  --color-bg-tertiary: #232925;
+
+  /* Text System */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e4ebe6;
+  --color-text-muted: #909692;
+  --color-text-inverse: #24292f;
+  --color-text-disabled: #8c959f;
+
+  /* === FUNCTIONAL COLORS === */
+  /* Interactive Elements */
+  --color-focus: #58a6ff;
+  --color-success: #1f883d;
+  --color-error: #d1242f;
+
+  /* === BORDER SYSTEM === */
+  --color-border-default: #6e7681;
+  --color-border-muted: #b6bfb8;
+  --color-border-tertiary: #232925;
+
+  /* === COMPONENT-SPECIFIC COLORS === */
+  /* Form Controls */
+  --color-input-bg: #000000;
+  --color-input-border: var(--color-border-default);
+  --color-input-border-focus: var(--color-focus);
+  --color-input-text: var(--color-text-primary);
+  --color-input-placeholder: #8c959f;
+
+  /* Buttons */
+  --color-btn-primary-bg: var(--color-brand-primary);
+  --color-btn-primary-text: var(--color-text-inverse);
+  --color-btn-primary-border: var(--color-brand-primary);
+  --color-btn-primary-shadow: var(--color-brand-dark);
+
+  --color-btn-secondary-bg: transparent;
+  --color-btn-secondary-text: var(--color-text-secondary);
+  --color-btn-secondary-border: var(--color-border-muted);
+
+  /* === SPACING SCALE === */
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+
+  /* === TYPOGRAPHY === */
+  --font-family-mono: "Monaspace Neon", monospace;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* === BORDERS & RADIUS === */
+  --border-width-thick: 2px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+
+  /* === ANIMATIONS === */
+  --transition-duration-fast: 0.1s;
+  /* Fast transitions */
+  --transition-duration-normal: 0.2s;
+  /* Normal transitions */
+  --transition-duration-slow: 0.3s;
+  /* Slow transitions */
+  --transition-easing-default: ease-in-out;
+  --transition-easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bgColor-muted {
+  background: var(--color-bg-secondary);
+}
+
+.borderColor-muted {
+  border-color: var(--color-border-tertiary);
+}
+
+.fgColor-accent {
+  color: var(--color-brand-primary);
+}
+
+.fgColor-muted {
+  color: var(--color-text-muted);
+}
+
+.hover-link-underline:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-skip-ink: auto;
+  text-underline-offset: 4px;
+}
+
+.font-monospace {
+  font-family: var(--brand-fontStack-monospace);
+}
+
+.container-width {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  &:has(.horizontal-layout) {
+    max-width: 100rem;
+  }
+}
+
+.horizontal-layout {
+  display: flex;
+  gap: var(--space-8);
+}
+
+/* Base Styles */
+@layer base {
+  html {
+    font-family: "Mona Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+
+  /* Typography Base Styles */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--brand-heading-fontFamily);
+    font-weight: 600;
+    font-stretch: semi-condensed;
+    font-style: normal;
+  }
+
+  h1 {
+    font-weight: var(--brand-heading-weight-1000);
+    /* font-size: var(--brand-text-size-1000); */
+    line-height: var(--brand-text-lineHeight-1000);
+    letter-spacing: var(--brand-text-letterSpacing-1000);
+  }
+
+  h5,
+  h6 {
+    font-family: "Mona Sans", system-ui, sans-serif;
+  }
+
+  /* Ensure buttons and inputs inherit font */
+  button,
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+  }
+}
+
+/* Component Utilities */
+@layer components {
+
+  /* Action/Eyebrow text style - uppercase monospace */
+  .text-action {
+    font-family: "Monaspace Neon", monospace;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  /* Desktop heading utilities */
+  .heading-1 {
+    font-family: "Mona Sans SemiCondensed", sans-serif;
+    font-size: 80px;
+    line-height: 0.9;
+    letter-spacing: -1.6px;
+    font-weight: 600;
+  }
+
+  .heading-2 {
+    font-family: "Mona Sans SemiCondensed", sans-serif;
+    font-size: 72px;
+    line-height: 0.9;
+    letter-spacing: -0.72px;
+    font-weight: 600;
+  }
+
+  .heading-3 {
+    font-family: "Mona Sans SemiCondensed", sans-serif;
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: -0.96px;
+    font-weight: 600;
+  }
+
+  .heading-4 {
+    font-family: "Mona Sans SemiCondensed", sans-serif;
+    font-size: 40px;
+    line-height: 1;
+    font-weight: 600;
+  }
+
+  .heading-5 {
+    font-family: "Mona Sans", sans-serif;
+    font-size: 32px;
+    line-height: 1.3;
+    letter-spacing: -0.32px;
+    font-weight: 600;
+  }
+
+  .heading-6 {
+    font-family: "Mona Sans", sans-serif;
+    font-size: 24px;
+    line-height: 1.35;
+    letter-spacing: 0.12px;
+    font-weight: 500;
+  }
+
+  /* Focus styles for accessibility */
+  .focus-outline {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+  }
+
+  /* Button reset */
+  .btn-reset {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+  }
+}
+
+/* Utility Styles */
+@layer utilities {
+
+  /* Text truncation */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Smooth scroll behavior */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom Scrollbar - GitHub Universe Theme */
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  /* Animations */
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+      transform: translateY(-20px) rotate(5deg);
+    }
+  }
+
+  @keyframes float-slow {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-30px);
+    }
+  }
+
+  @keyframes pulse-glow {
+
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out forwards;
+  }
+}

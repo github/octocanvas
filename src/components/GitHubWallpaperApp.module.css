@@ -1,0 +1,393 @@
+/* GitHub Wallpaper App - Tabs Styling */
+/* Based on GitHub Universe Tickets.module.css */
+
+/* Main layout container */
+.MainLayout {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+}
+
+/* When active (right column visible), use 2-column grid */
+.MainLayout--active {
+  display: grid;
+  grid-template-columns: 500px 1fr;
+  grid-template-rows: 1fr;
+  place-items: stretch;
+  padding-bottom: 0;
+  gap: 0;
+}
+
+/* Left column spans both rows when not active, single column when active */
+.LeftColumn {
+  max-width: 800px;
+  align-self: stretch;
+  margin-top: 2rem;
+  width: 100%;
+  grid-column: 1;
+  grid-row: span 2;
+  flex-grow: 1;
+}
+
+/* Right column positioning */
+.RightColumn {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  padding-inline: var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+/* Footer positioning - centered when no right column, in right column when active */
+.MainLayout > footer {
+  grid-column: 1 / -1;
+  grid-row: -1;
+  justify-self: center;
+}
+
+.MainLayout--active > footer {
+  grid-column: 2;
+  align-self: end;
+  justify-self: stretch;
+}
+
+.MainLayout--active .TabPanelContainer {
+  border-bottom: 0;
+  border-left: 0;
+  flex-grow: 1;
+}
+
+.LeftColumn {
+  max-width: 800px;
+  align-self: stretch;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+/* Left column - fixed width for form and controls */
+.MainLayout--active .LeftColumn {
+  width: 500px;
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+.TabPanelContainer {
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border-tertiary);
+  padding: var(--space-xl);
+}
+
+@media (min-width: 640px) {
+  .TabPanelContainer {
+    padding: var(--space-2xl);
+  }
+}
+
+/* Right column content area */
+.PreviewArea {
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border-tertiary);
+  padding: var(--space-xl);
+  border-top: none; /* Connect visually with tabs */
+}
+
+@media (min-width: 640px) {
+  .PreviewArea {
+    padding: var(--space-2xl);
+  }
+}
+
+@media (max-width: 1200px) {
+  .MainLayout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .MainLayout--active {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-xl);
+  }
+
+  .LeftColumn {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    grid-column: unset;
+    grid-row: unset;
+  }
+
+  .RightColumn {
+    width: 100%;
+    grid-column: unset;
+    grid-row: unset;
+  }
+
+  .MainLayout--active .LeftColumn {
+    width: 100%;
+  }
+
+  /* Footer back to normal flow on mobile */
+  .MainLayout > footer,
+  .MainLayout--active > footer {
+    grid-column: unset;
+    grid-row: unset;
+    align-self: unset;
+    justify-self: unset;
+  }
+
+  /* Restore borders when stacked */
+  .MainLayout--active .TabPanelContainer {
+    border: 2px solid var(--color-border-tertiary);
+    border-top: 0;
+  }
+
+  .PreviewArea {
+    border: 2px solid var(--color-border-tertiary);
+    border-radius: 8px;
+    margin-top: 0; /* Remove margin since we have gap on parent */
+  }
+
+  .RightColumn {
+    width: 100%;
+  }
+}
+
+/* Tab Navigation - exact from Universe Tickets */
+.TabContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.TabList {
+  position: relative;
+  display: flex;
+}
+
+@media (max-width: 1011px) {
+  .TabList {
+    border-bottom: 2px solid var(--color-border-tertiary);
+  }
+}
+
+.TabButton {
+  position: relative;
+  padding: var(--space-lg);
+  font-family: var(--font-family-mono);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: var(--font-weight-bold);
+  line-height: 100%;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  background-color: transparent;
+  border: var(--border-width-thick) solid var(--color-border-tertiary);
+  border-right: 0;
+  border-bottom: 0;
+  outline-offset: 2px;
+  transition: background-color var(--transition-duration-normal),
+    border-color 0.4s;
+}
+
+@media (max-width: 1011px) {
+  .TabButton {
+    flex: 1;
+  }
+}
+
+.TabButton:last-child {
+  border-right: var(--border-width-thick) solid var(--color-border-tertiary);
+}
+
+.TabButton:hover,
+.TabButton:active {
+  background-color: var(--color-bg-secondary);
+  border-top-color: var(--color-border-default);
+}
+
+.TabButton.isSelected {
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+  background-color: var(--color-bg-secondary);
+  border-top-color: var(--color-brand-primary);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 543px) {
+  .TabButton {
+    padding: var(--space-md) var(--space-xs);
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+}
+
+/* Form Content Styles */
+.FormContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.Section {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 2px solid var(--color-border-tertiary);
+}
+
+.TabSections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* Media queries consolidated */
+@media (min-width: 640px) {
+  .FormContent,
+  .TabSections {
+    gap: var(--space-2xl);
+  }
+
+  .Section {
+    margin-top: var(--space-2xl);
+  }
+}
+
+.ControlLabel {
+  display: block;
+  color: var(--color-text-primary);
+  font-size: 12px;
+  margin-bottom: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: "Mona Sans SemiCondensed", ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, monospace;
+}
+
+@media (min-width: 640px) {
+  .ControlLabel {
+    font-size: 14px;
+  }
+}
+
+.HelpText {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  margin-top: var(--space-xs);
+  font-family: var(--font-family-mono);
+}
+
+.CheckboxGroupLabel {
+  color: var(--color-text-primary);
+  font-size: 12px;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-family-mono);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: var(--font-weight-bold);
+}
+
+/* Consolidated font size media queries */
+@media (min-width: 640px) {
+  .ControlLabel,
+  .CheckboxGroupLabel {
+    font-size: 14px;
+  }
+}
+
+.CheckboxContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.TabPanel {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Footer Styles */
+.Footer {
+  text-align: center;
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-2xl);
+}
+
+.FooterText {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: var(--font-family-mono);
+  margin-bottom: var(--space-md);
+  padding-left: var(--space-md);
+  padding-right: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .FooterText {
+    font-size: 0.875rem;
+  }
+}
+
+.FooterText span {
+  display: inline-block;
+}
+
+.FooterText a {
+  color: var(--color-text-muted);
+  transition: all 0.3s ease;
+  text-decoration: underline;
+  display: inline-block;
+  font-weight: var(--font-weight-bold);
+}
+
+.FooterText a:hover {
+  color: var(--color-brand-primary);
+  text-decoration: none;
+}
+
+.FooterSeparator {
+  color: rgba(95, 237, 131, 0.5);
+}
+
+.FooterCopyright {
+  color: var(--color-brand-primary);
+  font-size: 0.75rem;
+  font-family: var(--font-family-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@media (min-width: 640px) {
+  .FooterCopyright {
+    font-size: 0.875rem;
+  }
+}
+
+.FooterCopyright a {
+  color: inherit;
+  text-decoration: none;
+}

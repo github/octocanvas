@@ -1,0 +1,156 @@
+/**
+ * Button Component CSS Module - GitHub Universe Design System
+ * Based on PricingOptions components from https://githubuniverse.com/
+ */
+
+/* Base button styles */
+.button {
+  /* Local button color variables */
+  --btn-primary-active-border: #47b262;
+  --btn-primary-disabled-bg: #f2f5f3;
+  --btn-primary-disabled-border: #d0d7de;
+  --btn-secondary-hover-border: #8b949e;
+  --btn-secondary-active-bg: #08872b;
+  --btn-secondary-active-border: #076520;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  border: var(--border-width-thick) solid;
+  border-radius: var(--border-radius-lg);
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition-property: background-color, box-shadow, border-color, color,
+    transform;
+  transition-duration: var(--transition-duration-normal);
+  transition-timing-function: var(--transition-easing-default);
+}
+
+.button:focus:focus-visible {
+  outline: 4px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}
+
+/* Button text styling */
+.button span {
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  line-height: 140%;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.button svg {
+  color: inherit;
+}
+
+/* Size variants */
+.medium {
+  padding: var(--space-sm) 18px;
+}
+
+@media (min-width: 768px) {
+  .medium {
+    padding: var(--space-md) var(--space-xl);
+  }
+}
+
+.large {
+  padding: var(--space-lg) var(--space-2xl);
+}
+
+@media (min-width: 1280px) {
+  .large {
+    padding: var(--space-xl) 36px;
+  }
+}
+
+/* Primary button variant */
+.primary {
+  background-color: var(--color-btn-primary-bg);
+  border-color: var(--color-btn-primary-border);
+  color: var(--color-btn-primary-text);
+  box-shadow: -2px 2px 0 var(--color-btn-primary-shadow);
+  transition-property: background-color, box-shadow, border-color, transform,
+    color;
+}
+
+.primary span {
+  transition-duration: var(--transition-duration-normal);
+  transition-property: color;
+  transition-timing-function: var(--transition-easing-default);
+}
+
+.primary:hover,
+.primary:focus-visible {
+  background-color: var(--color-brand-dark);
+  border-color: var(--color-brand-dark);
+  color: var(--color-text-primary);
+  box-shadow: -4px 4px 0 var(--color-brand-light);
+  transform: translate3d(2px, -2px, 0);
+}
+
+.primary:active {
+  transition-duration: var(--transition-duration-fast);
+  background-color: var(--color-brand-primary);
+  border-color: var(--btn-primary-active-border);
+  color: var(--color-btn-primary-text);
+  box-shadow: -2px 2px 0 var(--btn-primary-active-border) inset;
+  transform: translate3d(0, 0, 0);
+}
+
+.primary:disabled {
+  /* background-color: var(--btn-primary-disabled-bg);
+  border-color: var(--btn-primary-disabled-border); */
+  /* color: var(--color-text-disabled); */
+  box-shadow: none;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Secondary button variant */
+.secondary {
+  border-width: var(--border-width-thick);
+  background-color: var(--color-btn-secondary-bg);
+  border-color: var(--color-btn-secondary-border);
+  color: var(--color-btn-secondary-text);
+  box-shadow: -2px 2px 0 transparent inset;
+}
+
+.secondary:hover,
+.secondary:focus-visible {
+  border-color: var(--btn-secondary-hover-border);
+}
+
+.secondary:not(:disabled):active {
+  background-color: var(--btn-secondary-active-bg);
+  border-color: var(--btn-secondary-active-border);
+  color: var(--color-text-primary);
+  box-shadow: -2px 2px 0 var(--btn-secondary-active-border) inset;
+}
+
+/* Full width modifier */
+.fullWidth {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Icon styling */
+.icon {
+  margin-left: var(--space-xs);
+  transition: transform var(--transition-duration-slow)
+    var(--transition-easing-smooth);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Secondary button icon animation - smoother transition */
+.secondary:hover .icon,
+.secondary:focus-visible .icon {
+  transform: translate(2px, -2px);
+}
