@@ -135,7 +135,7 @@ const WallpaperGenerator = forwardRef<
       handleThreadsShare,
       handleInstagramShare,
     }),
-    []
+    [selectedTheme, avatarFilter, user, avatarBase64]
   );
 
   /**
