@@ -12,7 +12,7 @@
     "@astrojs/preact": "^4.1.1",
     "@astrojs/tailwind": "^5.1.2",
     "@primer/react-brand": "^0.58.2",
-    "astro": "^5.14.8",
+    "astro": "^5.15.1",
     "framer-motion": "^11.11.17",
     "html2canvas": "^1.4.1",
     "preact": "^10.24.3",
