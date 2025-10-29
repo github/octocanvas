@@ -189,7 +189,7 @@ Contributions are welcome! Here are some ways you can contribute:
 - Enhance SVG designs
 - Add animations or effects
 
-## Contributors
+## 🙌 Contributors
 
 Here is a list of everyone who has contributed to the Octocanvas!
 - [thelonewolf39](https://github.com/thelonewolf39)
