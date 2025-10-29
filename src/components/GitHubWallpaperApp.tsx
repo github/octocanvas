@@ -59,11 +59,14 @@ const getCleanUsername = (username: string) =>
 
 // Background theme configurations for wallpaper
 const BACKGROUND_THEMES = {
-  "github-universe-green": { label: "GitHub Universe Green" },
-  "github-universe-blue": { label: "GitHub Universe Blue" },
-  "universe-octocanvas": { label: "Universe Octocanvas" },
-  "github-dark": { label: "GitHub Dark" },
-};
+  "github-universe-green": { label: "GitHub Universe Green", type: "gradient" },
+  "github-universe-blue": { label: "GitHub Universe Blue", type: "gradient" },
+  "universe-octocanvas": { label: "Universe Octocanvas", type: "gradient" },
+  "github-dark": { label: "GitHub Dark", type: "gradient" },
+  "bg-images": { label: "Background Image 1", type: "image", imagePath: "/backgrounds/images.jpg" },
+  "bg-wallpaper": { label: "Background Image 2", type: "image", imagePath: "/backgrounds/wallpaper_footer_4KUHD_16_9.webp" },
+  "custom": { label: "Custom Upload", type: "image" },
+} as const;
 
 // Avatar filter options
 const AVATAR_FILTERS = {
@@ -86,6 +89,7 @@ export default function GitHubWallpaperApp() {
   >("github-universe-green");
   const [wallpaperAvatarFilter, setWallpaperAvatarFilter] =
     useState<keyof typeof AVATAR_FILTERS>("grayscale");
+  const [customBackgroundUrl, setCustomBackgroundUrl] = useState<string>("");
 
   // Devemon Card form controls
   const [devemonAvatarFilter, setDevemonAvatarFilter] = useState<
@@ -223,6 +227,24 @@ export default function GitHubWallpaperApp() {
       totalContributions: 0,
       weeks: [],
     };
+  };
+
+  /**
+   * Handle custom background image upload
+   */
+  const handleBackgroundUpload = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        setCustomBackgroundUrl(dataUrl);
+        setWallpaperTheme("custom");
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   /**
@@ -405,6 +427,32 @@ export default function GitHubWallpaperApp() {
                           )}
                         </PrimerSelect>
                       </div>
+
+                      {wallpaperTheme === "custom" && (
+                        <div>
+                          <label
+                            htmlFor="custom-background-upload"
+                            className={styles.ControlLabel}
+                          >
+                            Upload Custom Background
+                          </label>
+                          <input
+                            id="custom-background-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleBackgroundUpload}
+                            style={{
+                              display: "block",
+                              marginTop: "0.5rem",
+                              fontSize: "14px",
+                              color: "#E6EDF3",
+                            }}
+                          />
+                          <p className={styles.HelpText}>
+                            Upload a custom image for your wallpaper background
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -551,6 +599,7 @@ export default function GitHubWallpaperApp() {
               user={userData}
               selectedTheme={wallpaperTheme}
               avatarFilter={wallpaperAvatarFilter}
+              customBackgroundUrl={customBackgroundUrl}
             />
           </div>
 
