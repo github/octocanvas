@@ -18,6 +18,7 @@ interface WallpaperGeneratorProps {
   user: GitHubUser;
   selectedTheme: keyof typeof BACKGROUND_THEMES;
   avatarFilter: keyof typeof AVATAR_FILTERS;
+  customBackgroundUrl?: string;
 }
 
 export interface WallpaperGeneratorRef {
@@ -41,6 +42,7 @@ type SizeKey = keyof typeof SIZES;
 const BACKGROUND_THEMES = {
   "github-universe-green": {
     label: "GitHub Universe Green",
+    type: "gradient",
     gradient: {
       // Figma: linear-gradient(90deg, #BFFFD1 0%, #5FED83 100%)
       stops: [
@@ -55,6 +57,7 @@ const BACKGROUND_THEMES = {
   },
   "github-universe-blue": {
     label: "GitHub Universe Blue",
+    type: "gradient",
     gradient: {
       // Figma: linear-gradient(90deg, #DEFEFA 8.15%, #3094FF 74.77%, #0527FC 119.18%)
       // SVG adaptation: Start earlier with cyan, hold blue longer, push deep blue to edge
@@ -70,6 +73,7 @@ const BACKGROUND_THEMES = {
   },
   "universe-octocanvas": {
     label: "Universe Octocanvas",
+    type: "gradient",
     gradient: {
       // Solid color as a single-stop gradient
       stops: [
@@ -85,6 +89,7 @@ const BACKGROUND_THEMES = {
   },
   "github-dark": {
     label: "GitHub Dark",
+    type: "gradient",
     gradient: {
       stops: [
         { offset: "0%", color: "#909692" },
@@ -97,7 +102,21 @@ const BACKGROUND_THEMES = {
       end: "#0D1117",
     },
   },
-};
+  "bg-images": {
+    label: "Background Image 1",
+    type: "image",
+    imagePath: "/backgrounds/images.jpg",
+  },
+  "bg-wallpaper": {
+    label: "Background Image 2",
+    type: "image",
+    imagePath: "/backgrounds/wallpaper_footer_4KUHD_16_9.webp",
+  },
+  "custom": {
+    label: "Custom Upload",
+    type: "image",
+  },
+} as const;
 
 type BackgroundThemeKey = keyof typeof BACKGROUND_THEMES;
 
@@ -112,7 +131,7 @@ type AvatarFilterKey = keyof typeof AVATAR_FILTERS;
 const WallpaperGenerator = forwardRef<
   WallpaperGeneratorRef,
   WallpaperGeneratorProps
->(({ user, selectedTheme, avatarFilter }, ref) => {
+>(({ user, selectedTheme, avatarFilter, customBackgroundUrl = "" }, ref) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [avatarBase64, setAvatarBase64] = useState<string>("");
   const avatarBase64Ref = useRef<string>(""); // Ref to hold current avatar value for imperative handle
@@ -390,9 +409,20 @@ const WallpaperGenerator = forwardRef<
     // Get selected theme colors
     const theme = BACKGROUND_THEMES[selectedTheme];
 
-    // Set text colors based on theme (white for GitHub Dark, black for others)
-    const textColor = selectedTheme === "github-dark" ? "#FFFFFF" : "#000000";
-    const handleColor = selectedTheme === "github-dark" ? "#FFFFFF" : "#4F4F4F";
+    // Check if theme uses an image background
+    const isImageBackground = theme.type === "image";
+    let backgroundImageUrl = "";
+    if (isImageBackground) {
+      if (selectedTheme === "custom") {
+        backgroundImageUrl = customBackgroundUrl;
+      } else if ("imagePath" in theme) {
+        backgroundImageUrl = theme.imagePath;
+      }
+    }
+
+    // Set text colors based on theme (white for GitHub Dark and image backgrounds, black for others)
+    const textColor = selectedTheme === "github-dark" || isImageBackground ? "#FFFFFF" : "#000000";
+    const handleColor = selectedTheme === "github-dark" || isImageBackground ? "#FFFFFF" : "#4F4F4F";
 
     // Set avatar border color based on theme
     const avatarBorderColor =
@@ -516,15 +546,21 @@ const WallpaperGenerator = forwardRef<
       return `
         <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
           <defs>
-            <!-- Universe Octocanvas gradient -->
+            ${isImageBackground
+          ? `<!-- Background image pattern -->
+            <pattern id="bgPattern" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice">
+              <image href="${backgroundImageUrl}" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice"/>
+            </pattern>`
+          : `<!-- Universe Octocanvas gradient -->
             <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
               ${theme.gradient.stops
-          .map(
-            (stop: any) =>
-              `<stop offset="${stop.offset}" style="stop-color:${stop.color};stop-opacity:1" />`
-          )
-          .join("\n              ")}
-            </linearGradient>
+              .map(
+                (stop: any) =>
+                  `<stop offset="${stop.offset}" style="stop-color:${stop.color};stop-opacity:1" />`
+              )
+              .join("\n              ")}
+            </linearGradient>`
+        }
 
             <!-- Avatar clip path for card -->
             <clipPath id="cardAvatarClip">
@@ -532,7 +568,7 @@ const WallpaperGenerator = forwardRef<
         }" />
             </clipPath>
           </defs>
-          
+
           ${!isStatic
           ? `<!-- CSS Animations for preview -->
           <style>
@@ -545,9 +581,9 @@ const WallpaperGenerator = forwardRef<
           </style>`
           : ""
         }
-          
-          <!-- Background gradient -->
-          <rect width="${width}" height="${height}" fill="url(#bgGradient)"/>
+
+          <!-- Background ${isImageBackground ? "image" : "gradient"} -->
+          <rect width="${width}" height="${height}" fill="url(#${isImageBackground ? "bgPattern" : "bgGradient"})"/>
 
           <!-- Decorative elements -->
           ${generateDecorativeElements(width, height, scale)}
@@ -703,23 +739,28 @@ const WallpaperGenerator = forwardRef<
     return `
       <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
         <defs>
-          <!-- Dynamic theme gradient background -->
+          ${isImageBackground
+        ? `<!-- Background image pattern -->
+          <pattern id="bgPattern" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice">
+            <image href="${backgroundImageUrl}" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice"/>
+          </pattern>`
+        : `<!-- Dynamic theme gradient background -->
           <linearGradient id="bgGradient" x1="50%" y1="0%" x2="50%" y2="100%">
             ${theme.gradient.stops
-        .map(
-          (stop: any) =>
-            `<stop offset="${stop.offset}" style="stop-color:${stop.color};stop-opacity:1" />`
-        )
-        .join("\n            ")}
-          </linearGradient>
+            .map(
+              (stop: any) =>
+                `<stop offset="${stop.offset}" style="stop-color:${stop.color};stop-opacity:1" />`
+            )
+            .join("\n            ")}
+          </linearGradient>`}
 
-          <!-- Dark overlay for better text contrast (subtle) -->
+          ${!isImageBackground ? `<!-- Dark overlay for better text contrast (subtle) -->
           <linearGradient id="darkOverlay" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" style="stop-color:${(theme as any).overlay.start
       };stop-opacity:0.15" />
             <stop offset="100%" style="stop-color:${(theme as any).overlay.end
       };stop-opacity:0.25" />
-          </linearGradient>
+          </linearGradient>` : ""}
 
           <!-- Avatar circle clip path -->
           <clipPath id="avatarClip">
@@ -755,9 +796,10 @@ const WallpaperGenerator = forwardRef<
         : ""
       }
         
-        <!-- Background with GitHub Universe green gradient -->
-        <rect width="${width}" height="${height}" fill="url(#bgGradient)"/>
-        <rect width="${width}" height="${height}" fill="url(#darkOverlay)"/>
+        <!-- Background with ${isImageBackground ? "image" : "GitHub Universe gradient"} -->
+        <rect width="${width}" height="${height}" fill="url(#${isImageBackground ? "bgPattern" : "bgGradient"})"/>
+        ${!isImageBackground ? `<rect width="${width}" height="${height}" fill="url(#darkOverlay)"/>` : `<!-- Dark overlay for better text contrast on images -->
+        <rect width="${width}" height="${height}" fill="#000000" opacity="0.3"/>`}
 
         <!-- Avatar image with better centering and filter -->
         <image
