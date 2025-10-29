@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@astrojs/preact": "^4.1.1",
-    "@astrojs/tailwind": "^5.1.2",
+    "@astrojs/tailwind": "^6.0.2",
     "@primer/react-brand": "^0.58.2",
     "astro": "^5.14.8",
     "framer-motion": "^11.11.17",
