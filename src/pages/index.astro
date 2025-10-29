@@ -1,16 +1,10 @@
 ---
+// Landing page for GitHub Wallpaper Generator
+import GitHubWallpaperApp from "../components/GitHubWallpaperApp";
 import "../styles/global.css";
 
 // Base sub folder from environment variable
 const base = import.meta.env.BASE_URL || "/octocanvas";
-
-// Available backgrounds
-const backgrounds = [
-  "default_bg.png",
-  "wallpaper_footer.png",
-  "images.jpg",
-  "wallpaper_footer_4KUHD_16_9.webp"
-];
 ---
 
 <html lang="en">
@@ -25,20 +19,28 @@ const backgrounds = [
       content="Create GitHub Universe-style collectible cards and wallpapers"
     />
     <script>
-      // Scroll-driven animation fallback
+      // Scroll-driven animation fallback for browsers that don't support it
       document.addEventListener("DOMContentLoaded", function () {
         const heroTitle = document.getElementById("hero-title");
+
+        // Check if scroll-driven animations are supported
         if (!CSS.supports("animation-timeline", "scroll()") && heroTitle) {
+          // Fallback: Use scroll event for animation
           function updateHeroScale() {
             const scrolled = window.pageYOffset;
             const viewHeight = window.innerHeight;
-            const maxScroll = viewHeight * 0.5;
+            const maxScroll = viewHeight * 0.5; // 50% of viewport height
+
+            // Calculate scale (1 to 0.7) and opacity (1 to 0.8)
             const progress = Math.min(scrolled / maxScroll, 1);
-            const scale = 1 - progress * 0.3;
-            const opacity = 1 - progress * 0.2;
+            const scale = 1 - progress * 0.3; // 1 to 0.7
+            const opacity = 1 - progress * 0.2; // 1 to 0.8
+
             heroTitle.style.transform = `scale(${scale})`;
             heroTitle.style.opacity = opacity.toString();
           }
+
+          // Throttled scroll listener for performance
           let ticking = false;
           function handleScroll() {
             if (!ticking) {
@@ -49,80 +51,73 @@ const backgrounds = [
               ticking = true;
             }
           }
+
           window.addEventListener("scroll", handleScroll, { passive: true });
-          updateHeroScale();
+          updateHeroScale(); // Initial call
         }
       });
     </script>
   </head>
   <body>
-    <div class="flex flex-col min-h-screen items-center justify-center py-8">
-
-      <!-- Header -->
+    <!-- Main container with GitHub Universe styling -->
+    <div class="flex flex-col min-h-screen">
+      <!-- Header with Universe branding -->
       <header class="text-center pb-8 sm:pb-10 pt-8">
         <h1
           id="hero-title"
           class="text-4xl sm:text-5xl md:text-6xl lg:text-8xl text-white mb-3 sm:mb-4 uppercase tracking-wide drop-shadow-[0_0_30px_rgba(57,217,138,0.3)] flex items-center justify-center gap-3"
         >
-          <span class="text-universe-white inline-block transition-all duration-300">
+          <span
+            class="text-universe-white inline-block transition-all duration-300"
+          >
             Octocanvas
           </span>
         </h1>
-        <p class="text-base sm:text-lg md:text-xl text-universe-grey-1 uppercase tracking-wider font-mono font-medium px-4 mb-3 sm:mb-4 flex items-center justify-center gap-1">
-          <span class="transition-all duration-300 text-white flex flex-row gap-1.5 items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#ffffff" class="text-universe-white hover:text-universe-green-3 transition-all duration-300">
-              <path d="M12 1C5.923 1 1 5.923 1 12c0 4.867 3.149 8.979 7.521 10.436.55.096.756-.233.756-.522 0-.262-.013-1.128-.013-2.049-2.764.509-3.479-.674-3.699-1.292-.124-.317-.66-1.293-1.127-1.554-.385-.207-.936-.715-.014-.729.866-.014 1.485.797 1.691 1.128.99 1.663 2.571 1.196 3.204.907.096-.715.385-1.196.701-1.471-2.448-.275-5.005-1.224-5.005-5.432 0-1.196.426-2.186 1.128-2.956-.111-.275-.496-1.402.11-2.915 0 0 .921-.288 3.024 1.128a10.193 10.193 0 0 1 2.75-.371c.936 0 1.871.123 2.75.371 2.104-1.43 3.025-1.128 3.025-1.128.605 1.513.221 2.64.111 2.915.701.77 1.127 1.747 1.127 2.956 0 4.222-2.571 5.157-5.019 5.432.399.344.743 1.004.743 2.035 0 1.471-.014 2.654-.014 3.025 0 .289.206.632.756.522C19.851 20.979 23 16.854 23 12c0-6.077-4.922-11-11-11Z"></path>
-            </svg>
-            GitHub Universe
-          </span> · Collectibles Generator
+        <p
+          class="text-base sm:text-lg md:text-xl text-universe-grey-1 uppercase tracking-wider font-mono font-medium px-4 mb-3 sm:mb-4 flex items-center justify-center gap-1"
+        >
+          <span
+            class="transition-all duration-300 text-white flex flex-row gap-1.5 items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="#ffffff"
+              class="text-universe-white hover:text-universe-green-3 transition-all duration-300"
+              ><path
+                d="M12 1C5.923 1 1 5.923 1 12c0 4.867 3.149 8.979 7.521 10.436.55.096.756-.233.756-.522 0-.262-.013-1.128-.013-2.049-2.764.509-3.479-.674-3.699-1.292-.124-.317-.66-1.293-1.127-1.554-.385-.207-.936-.715-.014-.729.866-.014 1.485.797 1.691 1.128.99 1.663 2.571 1.196 3.204.907.096-.715.385-1.196.701-1.471-2.448-.275-5.005-1.224-5.005-5.432 0-1.196.426-2.186 1.128-2.956-.111-.275-.496-1.402.11-2.915 0 0 .921-.288 3.024 1.128a10.193 10.193 0 0 1 2.75-.371c.936 0 1.871.123 2.75.371 2.104-1.43 3.025-1.128 3.025-1.128.605 1.513.221 2.64.111 2.915.701.77 1.127 1.747 1.127 2.956 0 4.222-2.571 5.157-5.019 5.432.399.344.743 1.004.743 2.035 0 1.471-.014 2.654-.014 3.025 0 .289.206.632.756.522C19.851 20.979 23 16.854 23 12c0-6.077-4.922-11-11-11Z"
+              ></path></svg
+            >GitHub Universe</span
+          > · Collectibles Generator
         </p>
+        <div
+          class="flex
+            items-center
+            justify-center
+            gap-3
+            sm:gap-6
+            text-sm
+            sm:text-base
+            fgColor-accent
+            uppercase
+            tracking-wider
+            flex-wrap
+            font-monospace"
+        >
+          <span class="animate-pulse">●</span>
+          <span>Create</span>
+          <span class="animate-pulse" style="animation-delay: 0.5s;">●</span>
+          <span>Code</span>
+          <span class="animate-pulse" style="animation-delay: 1s;">●</span>
+          <span>Collect</span>
+          <span class="animate-pulse" style="animation-delay: 1.5s;">●</span>
+        </div>
       </header>
 
-      <!-- Wallpaper Container -->
-      <div id="wallpaper-container" class="rounded-lg shadow-lg relative w-11/12 max-w-[1200px]" style={`background-image: url('${base}/assets/backgrounds/${backgrounds[0]}'); background-size: cover; background-position: center; min-height: 400px; transition: background-image 0.3s ease-in-out;`}>
-        <div class="card-content text-center text-white p-4">
-          <h2 class="text-2xl sm:text-3xl md:text-4xl">Your Octocanvas Card</h2>
-          <p class="mt-2 text-lg">Collectible GitHub Universe Wallpapers</p>
-        </div>
-      </div>
-
-      <!-- Background Thumbnails -->
-      <div id="bg-thumbnails" class="flex flex-wrap justify-center gap-3 mt-6">
-        {backgrounds.map((bg) => (
-          <img
-            src={`${base}/assets/backgrounds/${bg}`}
-            alt={bg.split(".")[0]}
-            data-bg={bg}
-            class="thumbnail w-32 h-20 object-cover rounded-lg cursor-pointer border-4 border-transparent transition-all duration-300 hover:scale-105"
-          />
-        ))}
-      </div>
-
+      <!-- Main App Component (Preact) -->
+      <GitHubWallpaperApp client:load />
     </div>
-
-    <script type="module">
-      const wallpapers = document.querySelectorAll("#bg-thumbnails img");
-      const container = document.getElementById("wallpaper-container");
-
-      // Preload images
-      wallpapers.forEach(img => {
-        const pre = new Image();
-        pre.src = img.dataset.bg ? `${img.dataset.bg}` : img.src;
-      });
-
-      wallpapers.forEach(img => {
-        img.addEventListener("click", () => {
-          const bg = img.dataset.bg;
-          container.style.backgroundImage = `url('${bg}')`;
-
-          // Highlight selected thumbnail
-          wallpapers.forEach(w => w.classList.remove("border-universe-green-3"));
-          img.classList.add("border-universe-green-3");
-        });
-      });
-
-      // Set the first as selected by default
-      wallpapers[0].classList.add("border-universe-green-3");
-    </script>
   </body>
 </html>
