@@ -189,6 +189,18 @@ Contributions are welcome! Here are some ways you can contribute:
 - Enhance SVG designs
 - Add animations or effects
 
+## Contributors
+
+Here is a list of everyone who has contributed to the Octocanvas!
+- [thelonewolf39](https://github.com/thelonewolf39)
+- [MV Karan](https://github.com/mvkaran)
+- [Jessica Deen](https://github.com/jldeen)
+- [Damian Brady](https://github.com/Damovisa)
+- [Mike Perrotti](https://github.com/mperrotti)
+- [Zack Koppert](https://github.com/zkoppert)
+- [Katie Langerman](https://github.com/langermank)
+
+
 ## License 
 
 This project is licensed under the terms of the MIT open source license. Please refer to the [LICENSE](./LICENSE) file for the full terms.
