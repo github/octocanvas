@@ -22,7 +22,7 @@ A static web application that creates GitHub-themed collectibles from GitHub pro
 - ✨ **Animated Preview**: Particle effects and smooth animations in the preview
 
 ### 🎴 Devémon Card System
-- � **Trading Card Generator**: Create collectible trading cards from GitHub profiles
+- 🃏 **Trading Card Generator**: Create collectible trading cards from GitHub profiles
 - ⚡ **Power Calculation**: Calculates power based on followers, repositories, and contributions
 - 🌟 **6 Rarity Tiers**: From Common to Mythical with unique colors and types
   - **Common** (0-99): Gray, Normal type ⭐
@@ -34,10 +34,10 @@ A static web application that creates GitHub-themed collectibles from GitHub pro
 - 🎨 **Dual Formats**: 
   - **Card**: 350×550px portrait format with holographic effects
   - **Badge**: 320×240px landscape format with compact layout
-- � **Available for Hire Badge**: Toggle badge to show hiring availability
-- � **Stats Display**: Followers, repositories, contributions, and calculated power
-- � **Mini Contribution Graph**: Visual representation of GitHub activity
-- � **GitHub Primer Colors**: Authentic GitHub design system colors
+- 💼 **Available for Hire Badge**: Toggle badge to show hiring availability
+- 📊 **Stats Display**: Followers, repositories, contributions, and calculated power
+- 📈 **Mini Contribution Graph**: Visual representation of GitHub activity
+- 🎨 **GitHub Primer Colors**: Authentic GitHub design system colors
 - 💾 **High-Res Export**: 3× scale PNG downloads via html2canvas
 
 ### 🎯 README Banner Generator
