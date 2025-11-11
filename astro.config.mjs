@@ -22,4 +22,9 @@ export default defineConfig({
     tailwind(),
     preact({ compat: true })
   ],
+
+  // Disable dev toolbar to fix axobject-query error
+  devToolbar: {
+    enabled: false
+  },
 });

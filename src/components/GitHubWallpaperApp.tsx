@@ -63,7 +63,7 @@ const BACKGROUND_THEMES = {
   "github-universe-blue": { label: "GitHub Universe Blue", type: "gradient" },
   "universe-octocanvas": { label: "Universe Octocanvas", type: "gradient" },
   "github-dark": { label: "GitHub Dark", type: "gradient" },
-  "bg-images": { label: "Background Image 1", type: "image", imagePath: "/backgrounds/images.jpg" },
+  "bg-images": { label: "Background Image 1", type: "image", imagePath: "/backgrounds/images.png" },
   "bg-wallpaper": { label: "Background Image 2", type: "image", imagePath: "/backgrounds/wallpaper_footer_4KUHD_16_9.webp" },
   "custom": { label: "Custom Upload", type: "image" },
 } as const;
@@ -431,7 +431,6 @@ export default function GitHubWallpaperApp() {
                       {wallpaperTheme === "custom" && (
                         <div>
                           <label
-                            htmlFor="custom-background-upload"
                             className={styles.ControlLabel}
                           >
                             Upload Custom Background
@@ -441,15 +440,21 @@ export default function GitHubWallpaperApp() {
                             type="file"
                             accept="image/*"
                             onChange={handleBackgroundUpload}
-                            style={{
-                              display: "block",
-                              marginTop: "0.5rem",
-                              fontSize: "14px",
-                              color: "#E6EDF3",
-                            }}
+                            style={{ display: "none" }}
                           />
+                          <label htmlFor="custom-background-upload" className={styles.FileUploadLabel}>
+                            <SecondaryButton
+                              as="span"
+                              fullWidth={true}
+                              icon={<Icon name="upload" size="functional" />}
+                            >
+                              {customBackgroundUrl ? "Change Image" : "Choose File"}
+                            </SecondaryButton>
+                          </label>
                           <p className={styles.HelpText}>
-                            Upload a custom image for your wallpaper background
+                            {customBackgroundUrl
+                              ? "Custom background uploaded ✓"
+                              : "Upload a custom image for your wallpaper background"}
                           </p>
                         </div>
                       )}

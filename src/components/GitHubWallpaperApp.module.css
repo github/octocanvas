@@ -95,6 +95,12 @@
   border-top: none; /* Connect visually with tabs */
 }
 
+/* File upload label styling */
+.FileUploadLabel {
+  display: block;
+  cursor: pointer;
+}
+
 @media (min-width: 640px) {
   .PreviewArea {
     padding: var(--space-2xl);
