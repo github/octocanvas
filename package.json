@@ -9,19 +9,20 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^4.1.1",
-    "@astrojs/tailwind": "^5.1.2",
-    "@primer/react-brand": "^0.58.2",
-    "astro": "^5.14.8",
-    "framer-motion": "^11.11.17",
+    "@astrojs/preact": "^4.1.3",
+    "@astrojs/tailwind": "^6.0.2",
+    "@primer/react-brand": "^0.60.1",
+    "astro": "^5.16.6",
+    "framer-motion": "^12.23.26",
     "html2canvas": "^1.4.1",
-    "preact": "^10.24.3",
-    "react": "^19.2.0",
+    "preact": "^10.28.0",
+    "react": "^19.2.3",
     "react-social-icons": "^6.25.0",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
-    "@playwright/test": "^1.56.1",
-    "vite": "^7.1.11"
+    "@playwright/test": "^1.57.0",
+    "baseline-browser-mapping": "^2.9.8",
+    "vite": "^7.3.0"
   }
 }
