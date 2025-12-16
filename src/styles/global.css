@@ -24,7 +24,7 @@
 /* Monaspace Neon - Monospace for actions, labels (local file) */
 @font-face {
   font-family: 'Monaspace Neon';
-  src: url('/octocanvas/assets/MonaspaceNeonVarVF.woff2') format('woff2-variations');
+  src: url('/assets/MonaspaceNeonVarVF.woff2') format('woff2-variations');
   font-weight: 100 900;
   /* Variable font weight range */
   font-style: normal;
