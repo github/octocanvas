@@ -18,6 +18,7 @@ interface WallpaperGeneratorProps {
   user: GitHubUser;
   selectedTheme: keyof typeof BACKGROUND_THEMES;
   avatarFilter: keyof typeof AVATAR_FILTERS;
+  customBackgroundUrl?: string;
 }
 
 export interface WallpaperGeneratorRef {
@@ -41,6 +42,7 @@ type SizeKey = keyof typeof SIZES;
 const BACKGROUND_THEMES = {
   "github-universe-green": {
     label: "GitHub Universe Green",
+    type: "gradient",
     gradient: {
       // Figma: linear-gradient(90deg, #BFFFD1 0%, #5FED83 100%)
       stops: [
@@ -55,6 +57,7 @@ const BACKGROUND_THEMES = {
   },
   "github-universe-blue": {
     label: "GitHub Universe Blue",
+    type: "gradient",
     gradient: {
       // Figma: linear-gradient(90deg, #DEFEFA 8.15%, #3094FF 74.77%, #0527FC 119.18%)
       // SVG adaptation: Start earlier with cyan, hold blue longer, push deep blue to edge
@@ -70,6 +73,7 @@ const BACKGROUND_THEMES = {
   },
   "universe-octocanvas": {
     label: "Universe Octocanvas",
+    type: "gradient",
     gradient: {
       // Solid color as a single-stop gradient
       stops: [
@@ -85,6 +89,7 @@ const BACKGROUND_THEMES = {
   },
   "github-dark": {
     label: "GitHub Dark",
+    type: "gradient",
     gradient: {
       stops: [
         { offset: "0%", color: "#909692" },
@@ -97,7 +102,21 @@ const BACKGROUND_THEMES = {
       end: "#0D1117",
     },
   },
-};
+  "bg-images": {
+    label: "Background Image 1",
+    type: "image",
+    imagePath: "/backgrounds/images.png",
+  },
+  "bg-wallpaper": {
+    label: "Background Image 2",
+    type: "image",
+    imagePath: "/backgrounds/wallpaper_footer_4KUHD_16_9.webp",
+  },
+  "custom": {
+    label: "Custom Upload",
+    type: "image",
+  },
+} as const;
 
 type BackgroundThemeKey = keyof typeof BACKGROUND_THEMES;
 
@@ -112,12 +131,20 @@ type AvatarFilterKey = keyof typeof AVATAR_FILTERS;
 const WallpaperGenerator = forwardRef<
   WallpaperGeneratorRef,
   WallpaperGeneratorProps
->(({ user, selectedTheme, avatarFilter }, ref) => {
+>(({ user, selectedTheme, avatarFilter, customBackgroundUrl = "" }, ref) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [avatarBase64, setAvatarBase64] = useState<string>("");
   const avatarBase64Ref = useRef<string>(""); // Ref to hold current avatar value for imperative handle
   const [isMobile, setIsMobile] = useState(false);
   const [downloadingSize, setDownloadingSize] = useState<SizeKey | null>(null);
+
+  // Store custom background URL in ref for download
+  const customBackgroundRef = useRef<string>("");
+
+  // Update ref when customBackgroundUrl changes
+  useEffect(() => {
+    customBackgroundRef.current = customBackgroundUrl;
+  }, [customBackgroundUrl]);
 
   // Shared social media post text
   const SHARE_POST_TEXT =
@@ -390,9 +417,20 @@ const WallpaperGenerator = forwardRef<
     // Get selected theme colors
     const theme = BACKGROUND_THEMES[selectedTheme];
 
-    // Set text colors based on theme (white for GitHub Dark, black for others)
-    const textColor = selectedTheme === "github-dark" ? "#FFFFFF" : "#000000";
-    const handleColor = selectedTheme === "github-dark" ? "#FFFFFF" : "#4F4F4F";
+    // Check if theme uses an image background
+    const isImageBackground = theme.type === "image";
+    let backgroundImageUrl = "";
+    if (isImageBackground) {
+      if (selectedTheme === "custom") {
+        backgroundImageUrl = customBackgroundUrl;
+      } else if ("imagePath" in theme) {
+        backgroundImageUrl = theme.imagePath;
+      }
+    }
+
+    // Set text colors based on theme (white for GitHub Dark and image backgrounds, black for others)
+    const textColor = selectedTheme === "github-dark" || isImageBackground ? "#FFFFFF" : "#000000";
+    const handleColor = selectedTheme === "github-dark" || isImageBackground ? "#FFFFFF" : "#4F4F4F";
 
     // Set avatar border color based on theme
     const avatarBorderColor =
@@ -514,17 +552,20 @@ const WallpaperGenerator = forwardRef<
       const cardAvatarY = cardY + cardHeight * 0.25;
 
       return `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
           <defs>
-            <!-- Universe Octocanvas gradient -->
+            ${!isImageBackground
+          ? `<!-- Universe Octocanvas gradient -->
             <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
               ${theme.gradient.stops
-          .map(
-            (stop: any) =>
-              `<stop offset="${stop.offset}" style="stop-color:${stop.color};stop-opacity:1" />`
-          )
-          .join("\n              ")}
-            </linearGradient>
+              .map(
+                (stop: any) =>
+                  `<stop offset="${stop.offset}" style="stop-color:${stop.color};stop-opacity:1" />`
+              )
+              .join("\n              ")}
+            </linearGradient>`
+          : ""
+        }
 
             <!-- Avatar clip path for card -->
             <clipPath id="cardAvatarClip">
@@ -532,7 +573,7 @@ const WallpaperGenerator = forwardRef<
         }" />
             </clipPath>
           </defs>
-          
+
           ${!isStatic
           ? `<!-- CSS Animations for preview -->
           <style>
@@ -545,9 +586,12 @@ const WallpaperGenerator = forwardRef<
           </style>`
           : ""
         }
-          
-          <!-- Background gradient -->
-          <rect width="${width}" height="${height}" fill="url(#bgGradient)"/>
+
+          <!-- Background ${isImageBackground ? "image" : "gradient"} -->
+          ${isImageBackground
+          ? `<image href="${backgroundImageUrl}" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice"/>`
+          : `<rect width="${width}" height="${height}" fill="url(#bgGradient)"/>`
+        }
 
           <!-- Decorative elements -->
           ${generateDecorativeElements(width, height, scale)}
@@ -701,25 +745,26 @@ const WallpaperGenerator = forwardRef<
 
     // Default theme rendering (existing themes)
     return `
-      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
         <defs>
-          <!-- Dynamic theme gradient background -->
+          ${!isImageBackground
+        ? `<!-- Dynamic theme gradient background -->
           <linearGradient id="bgGradient" x1="50%" y1="0%" x2="50%" y2="100%">
             ${theme.gradient.stops
-        .map(
-          (stop: any) =>
-            `<stop offset="${stop.offset}" style="stop-color:${stop.color};stop-opacity:1" />`
-        )
-        .join("\n            ")}
+            .map(
+              (stop: any) =>
+                `<stop offset="${stop.offset}" style="stop-color:${stop.color};stop-opacity:1" />`
+            )
+            .join("\n            ")}
           </linearGradient>
-
           <!-- Dark overlay for better text contrast (subtle) -->
           <linearGradient id="darkOverlay" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" style="stop-color:${(theme as any).overlay.start
       };stop-opacity:0.15" />
             <stop offset="100%" style="stop-color:${(theme as any).overlay.end
       };stop-opacity:0.25" />
-          </linearGradient>
+          </linearGradient>`
+        : ""}
 
           <!-- Avatar circle clip path -->
           <clipPath id="avatarClip">
@@ -727,7 +772,7 @@ const WallpaperGenerator = forwardRef<
       }" />
           </clipPath>
         </defs>
-        
+
         ${!isStatic
         ? `<!-- CSS Animations for preview -->
         <style>
@@ -754,10 +799,14 @@ const WallpaperGenerator = forwardRef<
         </style>`
         : ""
       }
-        
-        <!-- Background with GitHub Universe green gradient -->
-        <rect width="${width}" height="${height}" fill="url(#bgGradient)"/>
-        <rect width="${width}" height="${height}" fill="url(#darkOverlay)"/>
+
+        <!-- Background with ${isImageBackground ? "image" : "GitHub Universe gradient"} -->
+        ${isImageBackground
+        ? `<image href="${backgroundImageUrl}" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice"/>
+        <!-- Dark overlay for better text contrast on images -->
+        <rect width="${width}" height="${height}" fill="#000000" opacity="0.3"/>`
+        : `<rect width="${width}" height="${height}" fill="url(#bgGradient)"/>
+        <rect width="${width}" height="${height}" fill="url(#darkOverlay)"/>`}
 
         <!-- Avatar image with better centering and filter -->
         <image
@@ -863,76 +912,121 @@ const WallpaperGenerator = forwardRef<
 
   /**
    * Convert SVG to PNG blob (for clipboard or download)
-   * Reusable function for both download and share operations
+   * Simplified approach: Create a simple container with background and content
    */
   const copyToClipboard = async (
     sizeKey: SizeKey = "desktop"
   ): Promise<Blob> => {
     const size = SIZES[sizeKey];
 
-    // Ensure avatar is loaded as base64 (use ref to get current value)
+    // Ensure avatar is loaded as base64
     const currentAvatarBase64 = avatarBase64Ref.current;
     if (!currentAvatarBase64) {
       throw new Error("Avatar not loaded yet");
     }
 
-    const svgString = generateSVG(size.width, size.height, true); // true = static version
+    // Get current custom background URL from ref
+    const currentCustomBg = customBackgroundRef.current;
 
-    // Create canvas for PNG conversion
-    const canvas = document.createElement("canvas");
-    canvas.width = size.width;
-    canvas.height = size.height;
-    const ctx = canvas.getContext("2d", { willReadFrequently: false });
+    // Check if we have a background image
+    const theme = BACKGROUND_THEMES[selectedTheme];
+    const isImageBackground = theme.type === "image";
+    let backgroundImageUrl = "";
 
-    if (!ctx) {
-      throw new Error("Failed to get canvas context");
+    if (isImageBackground) {
+      if (selectedTheme === "custom" && currentCustomBg) {
+        backgroundImageUrl = currentCustomBg;
+      } else if ("imagePath" in theme) {
+        backgroundImageUrl = theme.imagePath;
+      }
     }
 
-    // Encode SVG string properly for data URL
-    const encodedSvg = encodeURIComponent(svgString)
-      .replace(/'/g, "%27")
-      .replace(/"/g, "%22");
+    // Create a container div to render everything
+    const container = document.createElement("div");
+    container.style.position = "absolute";
+    container.style.left = "-9999px";
+    container.style.top = "0";
+    container.style.width = `${size.width}px`;
+    container.style.height = `${size.height}px`;
+    container.style.overflow = "hidden";
 
-    const dataUrl = `data:image/svg+xml,${encodedSvg}`;
+    // If we have a background image, set it as CSS background
+    if (backgroundImageUrl) {
+      container.style.backgroundImage = `url('${backgroundImageUrl}')`;
+      container.style.backgroundSize = "cover";
+      container.style.backgroundPosition = "center";
+      container.style.backgroundRepeat = "no-repeat";
+    }
 
-    // Create image and wait for it to load
-    const img = new Image();
+    // Generate SVG content (without background)
+    const svgString = generateSVG(size.width, size.height, true);
+    container.innerHTML = svgString;
 
-    await new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error("Image load timeout after 10 seconds"));
-      }, 10000); // 10 second timeout
+    document.body.appendChild(container);
 
-      img.onload = () => {
-        clearTimeout(timeout);
-        resolve();
-      };
+    try {
+      // If we have a background image, add the dark overlay as a child div
+      if (backgroundImageUrl) {
+        const overlay = document.createElement("div");
+        overlay.style.position = "absolute";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+        overlay.style.pointerEvents = "none";
+        container.insertBefore(overlay, container.firstChild);
+      }
 
-      img.onerror = (e) => {
-        clearTimeout(timeout);
-        console.error("Failed to load SVG image:", e);
-        reject(new Error("Failed to load SVG image"));
-      };
+      // Remove the background image element from SVG if present
+      if (isImageBackground) {
+        const svgElement = container.querySelector('svg');
+        if (svgElement) {
+          const bgImages = svgElement.querySelectorAll('image');
+          bgImages.forEach((img) => {
+            const href = img.getAttribute('href') || img.getAttribute('xlink:href');
+            if (href === backgroundImageUrl || (currentCustomBg && href === currentCustomBg)) {
+              img.remove();
+            }
+          });
+          // Remove overlay rect from SVG (we're using CSS overlay now)
+          const overlayRects = svgElement.querySelectorAll('rect[opacity="0.3"]');
+          overlayRects.forEach(rect => rect.remove());
+        }
+      }
 
-      img.src = dataUrl;
-    });
+      // Wait for images to load
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Draw the SVG image onto canvas
-    ctx.drawImage(img, 0, 0);
+      // Use html2canvas to render the entire container
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(container, {
+        backgroundColor: null,
+        scale: 1,
+        width: size.width,
+        height: size.height,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+      });
 
-    // Convert canvas to PNG blob
-    const blob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob(
-        (b) => {
-          if (b) resolve(b);
-          else reject(new Error("Failed to create blob from canvas"));
-        },
-        "image/png",
-        1.0
-      );
-    });
+      // Convert canvas to PNG blob
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob(
+          (b) => {
+            if (b) resolve(b);
+            else reject(new Error("Failed to create blob from canvas"));
+          },
+          "image/png",
+          1.0
+        );
+      });
 
-    return blob;
+      return blob;
+    } finally {
+      // Clean up
+      document.body.removeChild(container);
+    }
   };
 
   /**

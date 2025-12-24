@@ -40,6 +40,9 @@ export interface ButtonProps {
 
   /** Show icon on right */
   icon?: JSX.Element;
+
+  /** Render as different element (for use with labels) */
+  as?: "button" | "span";
 }
 
 export function Button({
@@ -52,6 +55,7 @@ export function Button({
   fullWidth = false,
   className = "",
   icon,
+  as = "button",
 }: ButtonProps) {
   // Combine CSS module classes
   const buttonClasses = [
@@ -64,6 +68,24 @@ export function Button({
     .filter(Boolean)
     .join(" ");
 
+  const content = (
+    <>
+      {/* Button text with GitHub Universe styling */}
+      <span>{children}</span>
+
+      {/* Icon if provided */}
+      {icon && <span className={styles.icon}>{icon as any}</span>}
+    </>
+  );
+
+  if (as === "span") {
+    return (
+      <span className={buttonClasses} onClick={onClick}>
+        {content}
+      </span>
+    );
+  }
+
   return (
     <button
       type={type}
@@ -71,11 +93,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
     >
-      {/* Button text with GitHub Universe styling */}
-      <span>{children}</span>
-
-      {/* Icon if provided */}
-      {icon && <span className={styles.icon}>{icon as any}</span>}
+      {content}
     </button>
   );
 }
