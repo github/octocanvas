@@ -20,6 +20,7 @@
 @import url("https://api.fontshare.com/v2/css?f[]=mona-sans@400,500,600&display=swap");
 @import '@primer/react-brand/fonts/fonts.css';
 @import '@primer/react-brand/lib/css/main.css';
+@import "tailwindcss";
 
 /* Monaspace Neon - Monospace for actions, labels (local file) */
 @font-face {
@@ -31,10 +32,7 @@
   font-display: swap;
 }
 
-/* Tailwind CSS directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind CSS directives - Replaced by @import "tailwindcss" at the top */
 
 /* Scroll-driven animations */
 @keyframes hero-shrink {
