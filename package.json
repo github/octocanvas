@@ -15,7 +15,7 @@
     "astro": "^5.16.15",
     "framer-motion": "^12.29.2",
     "html2canvas": "^1.4.1",
-    "preact": "^10.28.2",
+    "preact": "^10.28.3",
     "react": "^19.2.4",
     "react-social-icons": "^6.25.0",
     "tailwindcss": "^4.1.18"
