@@ -716,7 +716,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                     >
                       <span
                         style={{
-                          fontFamily: "Mona Sans SemiCondensed, sans-serif",
+                          fontFamily: "Mona Sans, sans-serif",
                           fontWeight: "600",
                           color: "#d1d5db",
                           fontSize: "12px",

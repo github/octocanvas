@@ -43,13 +43,13 @@
 }
 
 /* Footer positioning - centered when no right column, in right column when active */
-.MainLayout > footer {
+.MainLayout>footer {
   grid-column: 1 / -1;
   grid-row: -1;
   justify-self: center;
 }
 
-.MainLayout--active > footer {
+.MainLayout--active>footer {
   grid-column: 2;
   align-self: end;
   justify-self: stretch;
@@ -92,7 +92,8 @@
   background-color: var(--color-bg-secondary);
   border: 2px solid var(--color-border-tertiary);
   padding: var(--space-xl);
-  border-top: none; /* Connect visually with tabs */
+  border-top: none;
+  /* Connect visually with tabs */
 }
 
 @media (min-width: 640px) {
@@ -136,8 +137,8 @@
   }
 
   /* Footer back to normal flow on mobile */
-  .MainLayout > footer,
-  .MainLayout--active > footer {
+  .MainLayout>footer,
+  .MainLayout--active>footer {
     grid-column: unset;
     grid-row: unset;
     align-self: unset;
@@ -153,7 +154,8 @@
   .PreviewArea {
     border: 2px solid var(--color-border-tertiary);
     border-radius: 8px;
-    margin-top: 0; /* Remove margin since we have gap on parent */
+    margin-top: 0;
+    /* Remove margin since we have gap on parent */
   }
 
   .RightColumn {
@@ -255,6 +257,7 @@
 
 /* Media queries consolidated */
 @media (min-width: 640px) {
+
   .FormContent,
   .TabSections {
     gap: var(--space-2xl);
@@ -272,7 +275,7 @@
   margin-bottom: var(--space-xs);
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-family: "Mona Sans SemiCondensed", ui-monospace, SFMono-Regular, Menlo,
+  font-family: "Mona Sans", ui-monospace, SFMono-Regular, Menlo,
     Monaco, Consolas, monospace;
 }
 
@@ -301,6 +304,7 @@
 
 /* Consolidated font size media queries */
 @media (min-width: 640px) {
+
   .ControlLabel,
   .CheckboxGroupLabel {
     font-size: 14px;
@@ -322,6 +326,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

@@ -249,7 +249,7 @@
 
   /* Desktop heading utilities */
   .heading-1 {
-    font-family: "Mona Sans SemiCondensed", sans-serif;
+    font-family: "Mona Sans", sans-serif;
     font-size: 80px;
     line-height: 0.9;
     letter-spacing: -1.6px;
@@ -257,7 +257,7 @@
   }
 
   .heading-2 {
-    font-family: "Mona Sans SemiCondensed", sans-serif;
+    font-family: "Mona Sans", sans-serif;
     font-size: 72px;
     line-height: 0.9;
     letter-spacing: -0.72px;
@@ -265,7 +265,7 @@
   }
 
   .heading-3 {
-    font-family: "Mona Sans SemiCondensed", sans-serif;
+    font-family: "Mona Sans", sans-serif;
     font-size: 48px;
     line-height: 1;
     letter-spacing: -0.96px;
@@ -273,7 +273,7 @@
   }
 
   .heading-4 {
-    font-family: "Mona Sans SemiCondensed", sans-serif;
+    font-family: "Mona Sans", sans-serif;
     font-size: 40px;
     line-height: 1;
     font-weight: 600;
