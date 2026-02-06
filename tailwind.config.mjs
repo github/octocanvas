@@ -56,11 +56,10 @@ export default {
       fontFamily: {
         // Mona Sans - Primary body and UI text
         'sans': ['"Mona Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        // Mona Sans (with stretch fallback) - Headings
-        // Note: Mona Sans SemiCondensed not widely available, using Mona Sans with font-stretch
-        'display': ['"Mona Sans"', '"Mona Sans SemiCondensed"', 'system-ui', '-apple-system', 'sans-serif'],
+        // Mona Sans - Headings
+        'display': ['"Mona Sans"', 'system-ui', '-apple-system', 'sans-serif'],
         // Monaspace Neon - Actions, eyebrows, labels
-        'mono': ['"Mona Sans SemiCondensed"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        'mono': ['"Mona Sans"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
 
       // Font sizes matching Figma typography scale
