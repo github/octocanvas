@@ -13,7 +13,7 @@
     "@primer/react-brand": "^0.64.0",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.17.2",
-    "framer-motion": "^12.34.0",
+    "framer-motion": "^12.34.3",
     "html2canvas": "^1.4.1",
     "preact": "^10.28.3",
     "react": "^19.2.4",
