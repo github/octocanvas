@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "baseline-browser-mapping": "^2.9.19",
+    "baseline-browser-mapping": "^2.10.0",
     "vite": "^7.3.1"
   }
 }
