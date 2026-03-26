@@ -9,10 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^5.0.2",
+    "@astrojs/preact": "^5.1.0",
     "@primer/react-brand": "^0.65.1",
     "@tailwindcss/vite": "^4.2.2",
-    "astro": "^6.0.7",
+    "astro": "^6.1.0",
     "framer-motion": "^12.38.0",
     "html2canvas": "^1.4.1",
     "preact": "^10.29.0",
@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "baseline-browser-mapping": "^2.10.9",
-    "vite": "^8.0.1"
+    "baseline-browser-mapping": "^2.10.11",
+    "vite": "^8.0.3"
   }
 }
