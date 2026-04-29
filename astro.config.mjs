@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
-import tailwindcss from '@tailwindcss/vite';
 import preact from '@astrojs/preact';
 
 // Load environment variables
@@ -22,7 +21,5 @@ export default defineConfig({
     preact({ compat: true })
   ],
 
-  vite: {
-    plugins: [tailwindcss()],
-  },
+
 });

@@ -18,9 +18,52 @@
 
 /* Mona Sans - Primary body and UI text (via Fontshare - official source) */
 @import url("https://api.fontshare.com/v2/css?f[]=mona-sans@400,500,600&display=swap");
-@import '@primer/react-brand/fonts/fonts.css';
 @import '@primer/react-brand/lib/css/main.css';
 @import "tailwindcss";
+
+/* @primer/react-brand font declarations with locally served copies.
+   Replaces @import '@primer/react-brand/fonts/fonts.css' to avoid Vite
+   build-time warnings caused by unresolvable relative paths in that file. */
+@font-face {
+  font-family: 'Mona Sans';
+  src: url('/assets/MonaSansVF-wdth-wght-opsz.woff2') format('woff2 supports variations'),
+    url('/assets/MonaSansVF-wdth-wght-opsz.woff2') format('woff2-variations');
+  font-weight: 200 900;
+  font-display: swap;
+  font-synthesis: none;
+  font-feature-settings: 'liga' 0;
+}
+
+@font-face {
+  font-family: 'MonaSansFallback';
+  size-adjust: 104.5%;
+  ascent-override: 71%;
+  src: local(Arial);
+}
+
+@font-face {
+  font-family: 'MonaSansHeaderFallback';
+  size-adjust: 103.1%;
+  ascent-override: 70%;
+  src: local(Arial Bold);
+}
+
+@font-face {
+  font-family: 'Hubot Sans';
+  src: url('/assets/Hubot-Sans.woff2') format('woff2 supports variations'),
+    url('/assets/Hubot-Sans.woff2') format('woff2-variations');
+  font-weight: 200 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mona Sans Mono';
+  src: url('/assets/MonaSansMonoVF-wght.woff2') format('woff2 supports variations'),
+    url('/assets/MonaSansMonoVF-wght.woff2') format('woff2-variations');
+  font-weight: 200 900;
+  font-display: swap;
+  font-synthesis: none;
+}
 
 /* Monaspace Neon - Monospace for actions, labels (local file) */
 @font-face {
