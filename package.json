@@ -11,8 +11,7 @@
   "dependencies": {
     "@astrojs/preact": "^5.1.2",
     "@primer/react-brand": "^0.67.0",
-    "@tailwindcss/vite": "^4.2.4",
-    "astro": "^6.1.9",
+    "astro": "^6.1.10",
     "framer-motion": "^12.38.0",
     "html2canvas": "^1.4.1",
     "preact": "^10.29.1",
@@ -22,7 +21,10 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
-    "baseline-browser-mapping": "^2.10.23",
-    "vite": "^8.0.10"
+    "@tailwindcss/postcss": "^4.2.4",
+    "baseline-browser-mapping": "^2.10.24"
+  },
+  "overrides": {
+    "vite": "^7"
   }
 }

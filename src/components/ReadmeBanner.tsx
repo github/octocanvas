@@ -14,7 +14,7 @@
 
 import { useState, useEffect, useRef, forwardRef } from "preact/compat";
 import { useImperativeHandle } from "preact/hooks";
-import html2canvas from "html2canvas";
+
 import type { GitHubUser } from "./GitHubWallpaperApp";
 import { Checkbox, PrimerSelect } from "./ui/FormControls";
 import { Icon } from "./ui/Icon";
@@ -494,6 +494,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
       if (!standardBannerRef.current) return;
 
       try {
+        const html2canvas = (await import("html2canvas")).default;
         const canvas = await html2canvas(standardBannerRef.current, {
           scale: 2,
           backgroundColor: null,
@@ -542,6 +543,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
       if (!standardBannerRef.current) return;
 
       try {
+        const html2canvas = (await import("html2canvas")).default;
         const canvas = await html2canvas(standardBannerRef.current, {
           scale: 2,
           backgroundColor: null,
@@ -590,6 +592,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
       if (!standardBannerRef.current) return;
 
       try {
+        const html2canvas = (await import("html2canvas")).default;
         const canvas = await html2canvas(standardBannerRef.current, {
           scale: 2,
           backgroundColor: null,
@@ -638,6 +641,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
       if (!standardBannerRef.current) return;
 
       try {
+        const html2canvas = (await import("html2canvas")).default;
         const canvas = await html2canvas(standardBannerRef.current, {
           scale: 2,
           backgroundColor: null,
@@ -686,6 +690,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
       if (!standardBannerRef.current) return;
 
       try {
+        const html2canvas = (await import("html2canvas")).default;
         const canvas = await html2canvas(standardBannerRef.current, {
           scale: 2,
           backgroundColor: null,
