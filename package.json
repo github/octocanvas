@@ -15,7 +15,7 @@
     "framer-motion": "^12.38.0",
     "html2canvas": "^1.4.1",
     "preact": "^10.29.1",
-    "react": "^19.2.5",
+    "react": "^19.2.6",
     "react-social-icons": "^6.26.0",
     "tailwindcss": "^4.2.4"
   },
