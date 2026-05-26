@@ -9,20 +9,20 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^5.1.2",
+    "@astrojs/preact": "^5.1.3",
     "@primer/react-brand": "^0.67.0",
-    "astro": "^6.2.2",
-    "framer-motion": "^12.38.0",
+    "astro": "^6.3.8",
+    "framer-motion": "^12.40.0",
     "html2canvas": "^1.4.1",
-    "preact": "^10.29.1",
-    "react": "^19.2.5",
+    "preact": "^10.29.2",
+    "react": "^19.2.6",
     "react-social-icons": "^6.26.0",
-    "tailwindcss": "^4.2.4"
+    "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.59.1",
-    "@tailwindcss/postcss": "^4.2.4",
-    "baseline-browser-mapping": "^2.10.27"
+    "@playwright/test": "^1.60.0",
+    "@tailwindcss/postcss": "^4.3.0",
+    "baseline-browser-mapping": "^2.10.32"
   },
   "overrides": {
     "vite": "^7"
