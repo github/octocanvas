@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@astrojs/preact": "^5.1.3",
-    "@primer/react-brand": "^0.67.0",
+    "@primer/react-brand": "^0.68.0",
     "astro": "^6.3.8",
     "framer-motion": "^12.40.0",
     "html2canvas": "^1.4.1",
