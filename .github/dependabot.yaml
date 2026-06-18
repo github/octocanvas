@@ -4,10 +4,32 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+      - 'npm'
     groups:
-      all-dependencies:
-        patterns: ["*"]
+      minor-and-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+        patterns:
+          - '*'
+
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
       interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+      - 'github-actions'
+    groups:
+      actions-minor-and-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+        patterns:
+          - '*'
