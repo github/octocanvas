@@ -176,6 +176,30 @@ theme: {
 }
 ```
 
+## 🔄 CI / Automation
+
+This repository includes an automated PR validation and dependency management pipeline:
+
+| Layer | How it works |
+|-------|-------------|
+| **Validate & Test** | The `ci.yml` workflow runs on every pull request: typechecks with `astro check`, builds the site, then runs Playwright end-to-end tests against the preview server. The Playwright HTML report is uploaded as an artifact on failure. |
+| **Dependabot + Auto-merge** | Dependabot opens weekly PRs for npm and GitHub Actions dependency updates (minor/patch grouped). The `dependabot-automerge.yml` workflow auto-approves and squash-merges patch and minor updates once CI passes; major version bumps are left for manual review. |
+| **Copilot Code Review** | Enable GitHub Copilot automatic code review on PRs via repo **Settings → Code review → Copilot**. This is a repo setting, not a file — toggle it manually. |
+
+### Recommended manual setup
+
+1. **Branch protection**: require the `ci` status check to pass before merging to `main` (Settings → Rules → Branch protection).
+2. **Copilot auto-review**: enable Copilot code review on PRs (Settings → Code review → Copilot).
+
+### Local testing
+
+```bash
+npm ci
+npm run build
+npm run check        # astro typecheck
+npm run test         # playwright e2e tests (starts preview server automatically)
+```
+
 ## 🤝 Contributing
 
 Contributions are welcome! Here are some ways you can contribute:

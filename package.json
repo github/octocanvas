@@ -6,6 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "check": "astro check",
+    "test": "npx playwright test",
     "astro": "astro"
   },
   "dependencies": {
@@ -20,9 +22,12 @@
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
     "@playwright/test": "^1.61.0",
     "@tailwindcss/postcss": "^4.3.1",
-    "baseline-browser-mapping": "^2.10.37"
+    "@types/node": "^25.9.3",
+    "baseline-browser-mapping": "^2.10.37",
+    "typescript": "^6.0.3"
   },
   "overrides": {
     "vite": "^7"

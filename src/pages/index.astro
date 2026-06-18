@@ -27,6 +27,7 @@ const base = import.meta.env.BASE_URL || "/octocanvas";
         if (!CSS.supports("animation-timeline", "scroll()") && heroTitle) {
           // Fallback: Use scroll event for animation
           function updateHeroScale() {
+            if (!heroTitle) return;
             const scrolled = window.pageYOffset;
             const viewHeight = window.innerHeight;
             const maxScroll = viewHeight * 0.5; // 50% of viewport height
