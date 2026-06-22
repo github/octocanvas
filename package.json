@@ -11,7 +11,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^5.1.5",
+    "@astrojs/preact": "^6.0.0",
     "@primer/react-brand": "^0.68.0",
     "astro": "^6.4.8",
     "framer-motion": "^12.40.0",
