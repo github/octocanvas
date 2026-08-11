@@ -1,0 +1,192 @@
+name: Dependabot auto-merge writer
+
+on:
+  workflow_run:
+    workflows: [Dependabot auto-merge]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+jobs:
+  approve-and-automerge:
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Dependabot metadata
+        id: artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/dependabot-automerge"
+          artifact_id="$(gh api "repos/$REPOSITORY/actions/runs/$RUN_ID/artifacts" \
+            --jq '.artifacts[] | select(.name == "dependabot-automerge-metadata" and .expired == false) | .id' | head -n 1)"
+          if [ -z "$artifact_id" ]; then
+            echo "No Dependabot automerge artifact found for run $RUN_ID"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          gh api "repos/$REPOSITORY/actions/artifacts/$artifact_id/zip" > "$RUNNER_TEMP/dependabot-automerge/artifact.zip"
+          unzip -p "$RUNNER_TEMP/dependabot-automerge/artifact.zip" dependabot-automerge-metadata.json > "$RUNNER_TEMP/dependabot-automerge/metadata.json"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+
+      - name: Approve and enable auto-merge
+        if: steps.artifact.outputs.found == 'true'
+        uses: actions/github-script@v9
+        env:
+          METADATA_PATH: ${{ runner.temp }}/dependabot-automerge/metadata.json
+        with:
+          script: |
+            const fs = require('fs');
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const expectedRepo = `${owner}/${repo}`;
+            const run = context.payload.workflow_run;
+            const runPr = Array.isArray(run.pull_requests) && run.pull_requests[0];
+            if (!runPr || !runPr.number) {
+              core.info('Workflow run is not associated with a pull request; skipping.');
+              return;
+            }
+            if (run.actor && run.actor.login !== 'dependabot[bot]') {
+              core.info(`Workflow run actor is ${run.actor.login}; skipping.`);
+              return;
+            }
+
+            const metadata = JSON.parse(fs.readFileSync(process.env.METADATA_PATH, 'utf8'));
+            validateMetadataIdentity(metadata, runPr.number);
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: runPr.number,
+            });
+
+            if (pr.state !== 'open') {
+              core.info(`PR #${pr.number} is ${pr.state}; skipping.`);
+              return;
+            }
+            if (pr.user.login !== 'dependabot[bot]') {
+              core.info(`PR author is ${pr.user.login}; skipping.`);
+              return;
+            }
+            if (pr.base.repo.full_name !== expectedRepo) {
+              throw new Error(`Unexpected base repository: ${pr.base.repo.full_name}`);
+            }
+            if (!pr.head.repo || pr.head.repo.full_name !== expectedRepo) {
+              throw new Error(`Dependabot PR head must be in ${expectedRepo}; got ${pr.head.repo && pr.head.repo.full_name}`);
+            }
+            if (metadata.headSha !== pr.head.sha) {
+              core.info(`Stale metadata for ${metadata.headSha}; current PR head is ${pr.head.sha}.`);
+              return;
+            }
+
+            if (!validateNonMajorUpdate(metadata)) {
+              return;
+            }
+
+            const headSha = pr.head.sha;
+            await github.rest.pulls.createReview({
+              owner,
+              repo,
+              pull_number: pr.number,
+              commit_id: headSha,
+              event: 'APPROVE',
+              body: `Auto-approving Dependabot ${metadata.updateType} update for ${metadata.dependencyNames || 'dependencies'}.`,
+            });
+            core.info(`Approved PR #${pr.number} at ${headSha}.`);
+
+            const { data: afterApproval } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pr.number,
+            });
+            if (afterApproval.head.sha !== headSha) {
+              throw new Error(`PR head changed after approval (${headSha} -> ${afterApproval.head.sha}); not enabling auto-merge.`);
+            }
+
+            if (afterApproval.auto_merge) {
+              core.info('Auto-merge is already enabled.');
+              return;
+            }
+
+            const mutation = `
+              mutation($pullRequestId: ID!, $expectedHeadOid: GitObjectID!) {
+                enablePullRequestAutoMerge(input: {
+                  pullRequestId: $pullRequestId,
+                  mergeMethod: SQUASH,
+                  expectedHeadOid: $expectedHeadOid
+                }) {
+                  pullRequest {
+                    number
+                    autoMergeRequest { enabledAt mergeMethod }
+                  }
+                }
+              }
+            `;
+            await github.graphql(mutation, {
+              pullRequestId: afterApproval.node_id,
+              expectedHeadOid: headSha,
+            });
+            core.info(`Enabled squash auto-merge for PR #${pr.number} at ${headSha}.`);
+
+            function validateMetadataIdentity(metadata, prNumber) {
+              if (!metadata || metadata.schema !== 'dependabot-automerge/v1') {
+                throw new Error('Unexpected metadata schema.');
+              }
+              if (metadata.repository !== expectedRepo || metadata.baseRepo !== expectedRepo || metadata.headRepo !== expectedRepo) {
+                throw new Error(`Metadata repository mismatch: ${metadata.repository}, base ${metadata.baseRepo}, head ${metadata.headRepo}`);
+              }
+              if (!Number.isInteger(metadata.prNumber) || metadata.prNumber !== prNumber) {
+                throw new Error(`Metadata PR mismatch: ${metadata.prNumber} !== ${prNumber}`);
+              }
+              if (metadata.prUser !== 'dependabot[bot]') {
+                throw new Error(`Metadata PR user mismatch: ${metadata.prUser}`);
+              }
+              if (!/^[0-9a-f]{40}$/i.test(metadata.headSha)) {
+                throw new Error('Metadata head SHA is invalid.');
+              }
+            }
+
+            function validateNonMajorUpdate(metadata) {
+              if (typeof metadata.updateType !== 'string' || metadata.updateType.length === 0) {
+                throw new Error('Dependabot update type is missing.');
+              }
+              if (metadata.updateType === 'version-update:semver-major') {
+                core.info('Dependabot update is semver-major; skipping auto-merge.');
+                return false;
+              }
+              if (!/^version-update:semver-(minor|patch)$/.test(metadata.updateType)) {
+                throw new Error(`Unsupported Dependabot update type: ${metadata.updateType}`);
+              }
+              if (typeof metadata.maintainerChanges === 'string' && metadata.maintainerChanges.toLowerCase() === 'true') {
+                throw new Error('Dependabot metadata reports maintainer changes; not auto-merging.');
+              }
+
+              let dependencies;
+              try {
+                dependencies = JSON.parse(metadata.updatedDependenciesJson || '[]');
+              } catch (err) {
+                throw new Error(`Invalid updated-dependencies-json: ${err.message}`);
+              }
+              if (!Array.isArray(dependencies) || dependencies.length === 0) {
+                throw new Error('Dependabot metadata did not include updated dependencies.');
+              }
+              for (const dep of dependencies) {
+                const depUpdateType = dep['update-type'] || dep.updateType;
+                if (depUpdateType === 'version-update:semver-major') {
+                  throw new Error(`Dependency ${dep['dependency-name'] || dep.dependencyName || '<unknown>'} is semver-major.`);
+                }
+                if (depUpdateType && !/^version-update:semver-(minor|patch)$/.test(depUpdateType)) {
+                  throw new Error(`Unsupported dependency update type: ${depUpdateType}`);
+                }
+              }
+              return true;
+            }

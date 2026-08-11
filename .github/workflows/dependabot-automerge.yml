@@ -1,33 +1,62 @@
 name: Dependabot auto-merge
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened]
+
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 jobs:
-  auto-merge:
+  metadata:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
 
-      - name: Auto-approve patch and minor updates
-        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: gh pr review --approve "$PR_URL"
+      - name: Write metadata artifact
         env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUTPUT_PATH: ${{ runner.temp }}/dependabot-automerge-metadata.json
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_REPO: ${{ github.event.pull_request.base.repo.full_name }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_USER: ${{ github.event.pull_request.user.login }}
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+          DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+          PACKAGE_ECOSYSTEM: ${{ steps.metadata.outputs.package-ecosystem }}
+          DIRECTORY: ${{ steps.metadata.outputs.directory }}
+          UPDATED_DEPENDENCIES_JSON: ${{ steps.metadata.outputs.updated-dependencies-json }}
+          MAINTAINER_CHANGES: ${{ steps.metadata.outputs.maintainer-changes }}
+        run: |
+          set -euo pipefail
+          jq -n \
+            --arg schema 'dependabot-automerge/v1' \
+            --arg repository "$REPOSITORY" \
+            --argjson prNumber "$PR_NUMBER" \
+            --arg headSha "$HEAD_SHA" \
+            --arg baseRepo "$BASE_REPO" \
+            --arg headRepo "$HEAD_REPO" \
+            --arg prUser "$PR_USER" \
+            --arg updateType "$UPDATE_TYPE" \
+            --arg dependencyNames "$DEPENDENCY_NAMES" \
+            --arg packageEcosystem "$PACKAGE_ECOSYSTEM" \
+            --arg directory "$DIRECTORY" \
+            --arg updatedDependenciesJson "$UPDATED_DEPENDENCIES_JSON" \
+            --arg maintainerChanges "$MAINTAINER_CHANGES" \
+            '{schema: $schema, repository: $repository, prNumber: $prNumber, headSha: $headSha, baseRepo: $baseRepo, headRepo: $headRepo, prUser: $prUser, updateType: $updateType, dependencyNames: $dependencyNames, packageEcosystem: $packageEcosystem, directory: $directory, updatedDependenciesJson: $updatedDependenciesJson, maintainerChanges: $maintainerChanges}' \
+            > "$OUTPUT_PATH"
 
-      - name: Auto-merge patch and minor updates
-        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: gh pr merge --auto --squash "$PR_URL"
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload metadata artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependabot-automerge-metadata
+          path: ${{ runner.temp }}/dependabot-automerge-metadata.json
+          if-no-files-found: error
+          retention-days: 1
