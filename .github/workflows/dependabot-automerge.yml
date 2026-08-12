@@ -23,34 +23,40 @@ jobs:
         env:
           OUTPUT_PATH: ${{ runner.temp }}/dependabot-automerge-metadata.json
           REPOSITORY: ${{ github.repository }}
+          REPOSITORY_ID: ${{ github.repository_id }}
+          WORKFLOW_RUN_ID: ${{ github.run_id }}
+          WORKFLOW_RUN_ATTEMPT: ${{ github.run_attempt }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_ID: ${{ github.event.pull_request.id }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           BASE_REPO: ${{ github.event.pull_request.base.repo.full_name }}
+          BASE_REPO_ID: ${{ github.event.pull_request.base.repo.id }}
           HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_REPO_ID: ${{ github.event.pull_request.head.repo.id }}
           PR_USER: ${{ github.event.pull_request.user.login }}
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
-          DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
-          PACKAGE_ECOSYSTEM: ${{ steps.metadata.outputs.package-ecosystem }}
-          DIRECTORY: ${{ steps.metadata.outputs.directory }}
           UPDATED_DEPENDENCIES_JSON: ${{ steps.metadata.outputs.updated-dependencies-json }}
           MAINTAINER_CHANGES: ${{ steps.metadata.outputs.maintainer-changes }}
         run: |
           set -euo pipefail
           jq -n \
-            --arg schema 'dependabot-automerge/v1' \
+            --arg schema 'dependabot-automerge/v2' \
             --arg repository "$REPOSITORY" \
+            --argjson repositoryId "$REPOSITORY_ID" \
+            --argjson workflowRunId "$WORKFLOW_RUN_ID" \
+            --argjson workflowRunAttempt "$WORKFLOW_RUN_ATTEMPT" \
             --argjson prNumber "$PR_NUMBER" \
+            --argjson prId "$PR_ID" \
             --arg headSha "$HEAD_SHA" \
             --arg baseRepo "$BASE_REPO" \
+            --argjson baseRepoId "$BASE_REPO_ID" \
             --arg headRepo "$HEAD_REPO" \
+            --argjson headRepoId "$HEAD_REPO_ID" \
             --arg prUser "$PR_USER" \
             --arg updateType "$UPDATE_TYPE" \
-            --arg dependencyNames "$DEPENDENCY_NAMES" \
-            --arg packageEcosystem "$PACKAGE_ECOSYSTEM" \
-            --arg directory "$DIRECTORY" \
             --arg updatedDependenciesJson "$UPDATED_DEPENDENCIES_JSON" \
             --arg maintainerChanges "$MAINTAINER_CHANGES" \
-            '{schema: $schema, repository: $repository, prNumber: $prNumber, headSha: $headSha, baseRepo: $baseRepo, headRepo: $headRepo, prUser: $prUser, updateType: $updateType, dependencyNames: $dependencyNames, packageEcosystem: $packageEcosystem, directory: $directory, updatedDependenciesJson: $updatedDependenciesJson, maintainerChanges: $maintainerChanges}' \
+            '{schema: $schema, repository: $repository, repositoryId: $repositoryId, workflowRunId: $workflowRunId, workflowRunAttempt: $workflowRunAttempt, prNumber: $prNumber, prId: $prId, headSha: $headSha, baseRepo: $baseRepo, baseRepoId: $baseRepoId, headRepo: $headRepo, headRepoId: $headRepoId, prUser: $prUser, updateType: $updateType, updatedDependenciesJson: $updatedDependenciesJson, maintainerChanges: $maintainerChanges}' \
             > "$OUTPUT_PATH"
 
       - name: Upload metadata artifact
