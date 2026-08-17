@@ -24,7 +24,7 @@ export interface ButtonProps {
   size?: "medium" | "large";
 
   /** Click handler */
-  onClick?: () => void;
+  onClick?: () => void | Promise<void>;
 
   /** Button type */
   type?: "button" | "submit" | "reset";

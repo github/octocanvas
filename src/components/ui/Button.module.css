@@ -35,6 +35,8 @@
 
 .button:disabled {
   cursor: not-allowed;
+  opacity: 0.65;
+  pointer-events: none;
 }
 
 /* Button text styling */
