@@ -68,6 +68,24 @@ const LANGUAGE_COLORS: Record<string, string> = {
   Svelte: "#ff3e00",
 };
 
+const README_BANNER_FILENAME = "banner.png";
+
+const getReadmeBannerMarkdown = (username: string) =>
+  `![${username}'s GitHub Banner](https://raw.githubusercontent.com/${username}/${username}/main/${README_BANNER_FILENAME})`;
+
+const getReadmeBannerInstructions = (username: string, markdown: string) =>
+  `✓ Markdown copied to clipboard!
+
+Next steps:
+1. Download the banner and save it as ${README_BANNER_FILENAME}.
+2. Upload ${README_BANNER_FILENAME} to the root of your ${username}/${username} profile repository.
+3. Paste the copied Markdown in README.md.
+
+The Markdown points to /${README_BANNER_FILENAME} on the main branch:
+${markdown}
+
+If you use a different filename or folder, update the Markdown path to match.`;
+
 const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
   (
     { user, artType, availableForHire, showWebsite, showJoinDate, showBio },
@@ -520,19 +538,15 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
      * Copy markdown code to clipboard
      */
     const copyMarkdown = () => {
-      // You would typically host the image on GitHub or a CDN
-      // For now, we'll provide a template markdown that users can update
-      const markdown = `![${user.login}'s GitHub Banner](https://raw.githubusercontent.com/${user.login}/${user.login}/main/banner.png)`;
+      const markdown = getReadmeBannerMarkdown(user.login);
 
       navigator.clipboard
         .writeText(markdown)
         .then(() => {
-          alert(
-            "✓ Markdown copied to clipboard!\n\nUpload your banner.png to your profile repository and use this code in your README."
-          );
+          alert(getReadmeBannerInstructions(user.login, markdown));
         })
         .catch(() => {
-          alert("Markdown code:\n\n" + markdown);
+          alert(getReadmeBannerInstructions(user.login, markdown));
         });
     };
 
