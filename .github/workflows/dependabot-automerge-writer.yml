@@ -1,0 +1,288 @@
+name: Dependabot auto-merge writer
+
+on:
+  workflow_run:
+    workflows: [Dependabot auto-merge]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+jobs:
+  approve-and-automerge:
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'pull_request' }}
+    concurrency:
+      group: dependabot-automerge-${{ github.repository_id }}-${{ github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.id }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Dependabot metadata
+        id: artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/dependabot-automerge"
+          mapfile -t artifact_ids < <(
+            gh api --paginate "repos/$REPOSITORY/actions/runs/$RUN_ID/artifacts?per_page=100" \
+              --jq '.artifacts[] | select(.name == "dependabot-automerge-metadata" and .expired == false) | .id'
+          )
+          if [ "${#artifact_ids[@]}" -eq 0 ]; then
+            echo "No Dependabot automerge artifact found for run $RUN_ID"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "${#artifact_ids[@]}" -ne 1 ]; then
+            echo "Expected exactly one Dependabot automerge artifact for run $RUN_ID; found ${#artifact_ids[@]}" >&2
+            exit 1
+          fi
+          gh api "repos/$REPOSITORY/actions/artifacts/${artifact_ids[0]}/zip" > "$RUNNER_TEMP/dependabot-automerge/artifact.zip"
+          mapfile -t archive_entries < <(unzip -Z1 "$RUNNER_TEMP/dependabot-automerge/artifact.zip")
+          if [ "${#archive_entries[@]}" -ne 1 ] || [ "${archive_entries[0]}" != "dependabot-automerge-metadata.json" ]; then
+            echo "Dependabot automerge artifact must contain exactly dependabot-automerge-metadata.json" >&2
+            exit 1
+          fi
+          unzip -p "$RUNNER_TEMP/dependabot-automerge/artifact.zip" dependabot-automerge-metadata.json > "$RUNNER_TEMP/dependabot-automerge/metadata.json"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+
+      - name: Approve and enable auto-merge
+        if: steps.artifact.outputs.found == 'true'
+        uses: actions/github-script@v9
+        env:
+          METADATA_PATH: ${{ runner.temp }}/dependabot-automerge/metadata.json
+        with:
+          script: |
+            const fs = require('fs');
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const expectedRepo = `${owner}/${repo}`;
+            const expectedRepoId = context.payload.repository.id;
+            const run = context.payload.workflow_run;
+            const runPullRequests = Array.isArray(run.pull_requests) ? run.pull_requests : [];
+            if (runPullRequests.length !== 1) {
+              throw new Error(`Expected workflow run to identify exactly one pull request; found ${runPullRequests.length}.`);
+            }
+            const runPr = runPullRequests[0];
+            validateWorkflowRun(run, runPr);
+
+            const metadata = JSON.parse(fs.readFileSync(process.env.METADATA_PATH, 'utf8'));
+            validateMetadataIdentity(metadata, run, runPr);
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: runPr.number,
+            });
+
+            if (pr.state !== 'open') {
+              core.info(`PR #${pr.number} is ${pr.state}; skipping.`);
+              return;
+            }
+            if (pr.user.login !== 'dependabot[bot]') {
+              core.info(`PR author is ${pr.user.login}; skipping.`);
+              return;
+            }
+            if (pr.id !== runPr.id) {
+              throw new Error(`Workflow run PR id ${runPr.id} does not match current PR id ${pr.id}.`);
+            }
+            if (pr.base.repo.id !== expectedRepoId || pr.base.repo.full_name !== expectedRepo) {
+              throw new Error(`Unexpected base repository: ${pr.base.repo.full_name}`);
+            }
+            if (!pr.head.repo || pr.head.repo.id !== expectedRepoId || pr.head.repo.full_name !== expectedRepo) {
+              throw new Error(`Dependabot PR head must be in ${expectedRepo}; got ${pr.head.repo && pr.head.repo.full_name}`);
+            }
+            if (pr.head.sha !== run.head_sha) {
+              core.info(`Stale workflow run for ${run.head_sha}; current PR head is ${pr.head.sha}.`);
+              return;
+            }
+
+            const dependencies = validateNonMajorUpdate(metadata);
+            if (!dependencies) {
+              return;
+            }
+
+            const headSha = pr.head.sha;
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner,
+              repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+            const alreadyApproved = reviews.some((review) =>
+              review.user && review.user.login === 'github-actions[bot]' &&
+              review.state === 'APPROVED' &&
+              review.commit_id === headSha
+            );
+            if (alreadyApproved) {
+              core.info(`PR #${pr.number} is already approved by github-actions[bot] at ${headSha}.`);
+            } else {
+              await github.rest.pulls.createReview({
+                owner,
+                repo,
+                pull_number: pr.number,
+                commit_id: headSha,
+                event: 'APPROVE',
+                body: `Auto-approving Dependabot ${metadata.updateType} update for ${formatDependencySummary(dependencies)}.`,
+              });
+              core.info(`Approved PR #${pr.number} at ${headSha}.`);
+            }
+
+            const { data: afterApproval } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pr.number,
+            });
+            if (afterApproval.head.sha !== headSha) {
+              throw new Error(`PR head changed after approval (${headSha} -> ${afterApproval.head.sha}); not enabling auto-merge.`);
+            }
+
+            if (afterApproval.auto_merge) {
+              core.info('Auto-merge is already enabled.');
+              return;
+            }
+
+            const mutation = `
+              mutation($pullRequestId: ID!, $expectedHeadOid: GitObjectID!) {
+                enablePullRequestAutoMerge(input: {
+                  pullRequestId: $pullRequestId,
+                  mergeMethod: SQUASH,
+                  expectedHeadOid: $expectedHeadOid
+                }) {
+                  pullRequest {
+                    number
+                    autoMergeRequest { enabledAt mergeMethod }
+                  }
+                }
+              }
+            `;
+            await github.graphql(mutation, {
+              pullRequestId: afterApproval.node_id,
+              expectedHeadOid: headSha,
+            });
+            core.info(`Enabled squash auto-merge for PR #${pr.number} at ${headSha}.`);
+
+            function validateWorkflowRun(workflowRun, workflowRunPr) {
+              if (workflowRun.name !== 'Dependabot auto-merge' ||
+                  workflowRun.event !== 'pull_request' ||
+                  workflowRun.conclusion !== 'success') {
+                throw new Error(`Unexpected workflow run: ${workflowRun.name}, ${workflowRun.event}, ${workflowRun.conclusion}`);
+              }
+              if (!workflowRun.actor || workflowRun.actor.login !== 'dependabot[bot]' ||
+                  !workflowRun.triggering_actor || workflowRun.triggering_actor.login !== 'dependabot[bot]') {
+                throw new Error('Workflow run actor and triggering actor must both be dependabot[bot].');
+              }
+              if (!workflowRun.head_repository ||
+                  workflowRun.head_repository.id !== expectedRepoId ||
+                  workflowRun.head_repository.full_name !== expectedRepo) {
+                throw new Error(`Unexpected workflow run head repository: ${workflowRun.head_repository && workflowRun.head_repository.full_name}`);
+              }
+              if (!workflowRunPr || !Number.isInteger(workflowRunPr.number) || !Number.isInteger(workflowRunPr.id)) {
+                throw new Error('Workflow run pull request identity is invalid.');
+              }
+              if (!workflowRunPr.base || !workflowRunPr.base.repo ||
+                  workflowRunPr.base.repo.id !== expectedRepoId ||
+                  !workflowRunPr.head || !workflowRunPr.head.repo ||
+                  workflowRunPr.head.repo.id !== expectedRepoId) {
+                throw new Error('Workflow run pull request repositories do not match the current repository.');
+              }
+              if (workflowRun.head_sha !== workflowRunPr.head.sha) {
+                throw new Error(`Workflow run head ${workflowRun.head_sha} does not match associated PR head ${workflowRunPr.head.sha}.`);
+              }
+              if (!/^[0-9a-f]{40}$/i.test(workflowRun.head_sha)) {
+                throw new Error('Workflow run head SHA is invalid.');
+              }
+            }
+
+            function validateMetadataIdentity(metadata, workflowRun, workflowRunPr) {
+              if (!metadata || metadata.schema !== 'dependabot-automerge/v2') {
+                throw new Error('Unexpected metadata schema.');
+              }
+              if (metadata.repository !== expectedRepo ||
+                  metadata.repositoryId !== expectedRepoId ||
+                  metadata.baseRepo !== expectedRepo ||
+                  metadata.baseRepoId !== expectedRepoId ||
+                  metadata.headRepo !== expectedRepo ||
+                  metadata.headRepoId !== expectedRepoId) {
+                throw new Error(`Metadata repository mismatch: ${metadata.repository}, base ${metadata.baseRepo}, head ${metadata.headRepo}`);
+              }
+              if (!Number.isInteger(metadata.workflowRunId) || metadata.workflowRunId !== workflowRun.id ||
+                  !Number.isInteger(metadata.workflowRunAttempt) || metadata.workflowRunAttempt !== workflowRun.run_attempt) {
+                throw new Error('Metadata workflow run identity does not match the triggering workflow run.');
+              }
+              if (!Number.isInteger(metadata.prNumber) || metadata.prNumber !== workflowRunPr.number ||
+                  !Number.isInteger(metadata.prId) || metadata.prId !== workflowRunPr.id) {
+                throw new Error(`Metadata PR mismatch: #${metadata.prNumber}/${metadata.prId} !== #${workflowRunPr.number}/${workflowRunPr.id}`);
+              }
+              if (metadata.prUser !== 'dependabot[bot]') {
+                throw new Error(`Metadata PR user mismatch: ${metadata.prUser}`);
+              }
+              if (metadata.headSha !== workflowRun.head_sha) {
+                throw new Error(`Metadata head ${metadata.headSha} does not match workflow run head ${workflowRun.head_sha}.`);
+              }
+            }
+
+            function validateNonMajorUpdate(metadata) {
+              if (metadata.maintainerChanges !== 'false') {
+                throw new Error('Dependabot metadata must explicitly report no maintainer changes.');
+              }
+              if (typeof metadata.updateType !== 'string' || metadata.updateType.length === 0) {
+                throw new Error('Dependabot update type is missing.');
+              }
+              if (metadata.updateType === 'version-update:semver-major') {
+                core.info('Dependabot update is semver-major; skipping auto-merge.');
+                return false;
+              }
+              if (!/^version-update:semver-(minor|patch)$/.test(metadata.updateType)) {
+                throw new Error(`Unsupported Dependabot update type: ${metadata.updateType}`);
+              }
+              if (typeof metadata.updatedDependenciesJson !== 'string') {
+                throw new Error('Dependabot updated dependencies metadata is missing.');
+              }
+
+              let dependencies;
+              try {
+                dependencies = JSON.parse(metadata.updatedDependenciesJson);
+              } catch (err) {
+                throw new Error(`Invalid updated-dependencies-json: ${err.message}`);
+              }
+              if (!Array.isArray(dependencies) || dependencies.length === 0 || dependencies.length > 1000) {
+                throw new Error('Dependabot metadata must include between 1 and 1000 updated dependencies.');
+              }
+              for (const dep of dependencies) {
+                if (!dep || typeof dep !== 'object' || Array.isArray(dep)) {
+                  throw new Error('Dependabot updated dependency entry is invalid.');
+                }
+                const depUpdateType = dep['update-type'] || dep.updateType;
+                if (depUpdateType === 'version-update:semver-major') {
+                  throw new Error(`Dependency ${dep['dependency-name'] || dep.dependencyName || '<unknown>'} is semver-major.`);
+                }
+                if (typeof depUpdateType !== 'string' || !/^version-update:semver-(minor|patch)$/.test(depUpdateType)) {
+                  throw new Error(`Unsupported dependency update type: ${depUpdateType}`);
+                }
+              }
+              return dependencies;
+            }
+
+            function formatDependencySummary(dependencies) {
+              const names = dependencies
+                .map((dep) => dep['dependency-name'] || dep.dependencyName)
+                .filter((name) => typeof name === 'string' && name.length > 0);
+              if (names.length === 0) {
+                return 'dependencies';
+              }
+              const shown = names.slice(0, 10).map((name) => {
+                const bounded = name.replace(/\s+/g, ' ').replace(/`/g, "'").slice(0, 80);
+                return `\`${bounded}\``;
+              });
+              if (names.length > shown.length) {
+                shown.push(`and ${names.length - shown.length} more`);
+              }
+              return shown.join(', ').slice(0, 1000);
+            }
