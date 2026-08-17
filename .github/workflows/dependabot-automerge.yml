@@ -60,7 +60,7 @@ jobs:
             > "$OUTPUT_PATH"
 
       - name: Upload metadata artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dependabot-automerge-metadata
           path: ${{ runner.temp }}/dependabot-automerge-metadata.json
