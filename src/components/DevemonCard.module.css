@@ -147,11 +147,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.25rem;
   padding: 0 0.5rem;
   height: 24px;
   font-family: var(--font-family-mono);
   font-weight: 500;
   font-size: 0.625rem;
+  line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-radius: 0.25rem;
@@ -163,11 +165,43 @@
 }
 
 .HireBadgeIcon {
-  margin-right: 0.25rem;
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 12px;
+  height: 10px;
+  box-sizing: border-box;
+  margin-top: 2px;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+}
+
+.HireBadgeIconHandle {
+  position: absolute;
+  left: 3px;
+  top: -5px;
+  display: block;
+  width: 6px;
+  height: 5px;
+  box-sizing: border-box;
+  border: 1.5px solid currentColor;
+  border-bottom: 0;
+  border-radius: 2px 2px 0 0;
+}
+
+.HireBadgeIconSeam {
+  position: absolute;
+  left: -1.5px;
+  right: -1.5px;
+  top: 3px;
+  display: block;
+  border-top: 1.5px solid currentColor;
 }
 
 .HireBadgeText {
-  margin-left: 0.25rem;
+  display: block;
+  line-height: 1;
+  transform: translateY(-1px);
 }
 
 /* Stats Section */
@@ -208,6 +242,19 @@
   font-weight: bold;
   font-family: var(--font-family-mono);
   margin-top: 0.125rem;
+}
+
+.CardFooter {
+  margin-top: 0.75rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--color-border-tertiary);
+  text-align: center;
+}
+
+.CardFooterText {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-family: var(--font-family-mono);
 }
 
 /* Controls Section */

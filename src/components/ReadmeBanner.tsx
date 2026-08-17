@@ -17,7 +17,6 @@ import { useImperativeHandle } from "preact/hooks";
 
 import type { GitHubUser } from "./GitHubWallpaperApp";
 import { Checkbox, PrimerSelect } from "./ui/FormControls";
-import { Icon } from "./ui/Icon";
 import { PrimaryButton, SecondaryButton } from "./ui/Button";
 import styles from "./ReadmeBanner.module.css";
 import sharedStyles from "./shared.module.css";
@@ -961,15 +960,60 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
                               fontSize: "14px",
                               fontWeight: "500",
                               fontFamily: "monospace",
+                              lineHeight: "1",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "8px",
                             }}
                           >
-                            <Icon
-                              name="briefcase"
-                              size="functional"
-                              color="currentColor"
-                              label="Available for Hire"
-                            />{" "}
-                            OPEN TO WORK
+                            <span
+                              aria-hidden="true"
+                              style={{
+                                position: "relative",
+                                width: "16px",
+                                height: "12px",
+                                display: "block",
+                                flexShrink: 0,
+                                boxSizing: "border-box",
+                                marginTop: "4px",
+                                border: "2px solid currentColor",
+                                borderRadius: "2px",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  left: "4px",
+                                  top: "-7px",
+                                  display: "block",
+                                  width: "8px",
+                                  height: "7px",
+                                  boxSizing: "border-box",
+                                  border: "2px solid currentColor",
+                                  borderBottom: 0,
+                                  borderRadius: "3px 3px 0 0",
+                                }}
+                              />
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  left: "-2px",
+                                  right: "-2px",
+                                  top: "4px",
+                                  display: "block",
+                                  borderTop: "2px solid currentColor",
+                                }}
+                              />
+                            </span>
+                            <span
+                              style={{
+                                display: "block",
+                                lineHeight: "1",
+                                transform: "translateY(-1px)",
+                              }}
+                            >
+                              OPEN TO WORK
+                            </span>
                           </div>
                         )}
                       </div>

@@ -494,13 +494,14 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                   {availableForHire && (
                     <div className={styles.HireBadgeContainer}>
                       <span className={styles.HireBadge}>
-                        <Icon
-                          name="briefcase"
-                          size={12}
-                          color="currentColor"
-                          label=""
+                        <span
+                          aria-hidden="true"
+                          data-briefcase-icon="true"
                           className={styles.HireBadgeIcon}
-                        />
+                        >
+                          <span className={styles.HireBadgeIconHandle} />
+                          <span className={styles.HireBadgeIconSeam} />
+                        </span>
                         <span className={styles.HireBadgeText}>
                           OPEN TO WORK
                         </span>
@@ -611,8 +612,8 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
               </div>
 
               {/* Footer */}
-              <div className="mt-3 pt-2.5 border-t borderColor-muted text-center">
-                <p className="text-xs text-gray-400 font-mono">
+              <div className={styles.CardFooter}>
+                <p className={styles.CardFooterText}>
                   Developer since {formattedDate}
                 </p>
               </div>
@@ -803,11 +804,14 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                           display: "inline-flex",
                           alignItems: "center",
                           justifyContent: "center",
+                          gap: "4px",
                           padding: "0 8px",
                           height: "24px",
+                          boxSizing: "border-box",
                           fontFamily: "monospace",
                           fontWeight: "500",
                           fontSize: "9px",
+                          lineHeight: "1",
                           textTransform: "uppercase",
                           letterSpacing: "0.05em",
                           borderRadius: "4px",
@@ -818,19 +822,17 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
                         }}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 16 16"
-                          fill="currentColor"
-                          style={{
-                            width: "12px",
-                            height: "12px",
-                            marginRight: "4px",
-                          }}
+                        <span
+                          aria-hidden="true"
+                          data-briefcase-icon="true"
+                          className={styles.HireBadgeIcon}
                         >
-                          <path d="M7.5 1.75C7.5.784 8.284 0 9.25 0h5.5c.966 0 1.75.784 1.75 1.75v11.5A1.75 1.75 0 0 1 14.75 15h-5.5a1.75 1.75 0 0 1-1.75-1.75V1.75zm1.75-.25a.25.25 0 0 0-.25.25v11.5c0 .138.112.25.25.25h5.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25h-5.5zM4.943 9.25A.75.75 0 0 1 4 8.5h-.2a1.55 1.55 0 0 0-1.55 1.55v5.2c0 .856.694 1.55 1.55 1.55h.2a.75.75 0 0 1 0 1.5h-.2A3.05 3.05 0 0 1 .75 15.25v-5.2A3.05 3.05 0 0 1 3.8 7h.2a.75.75 0 0 1 .75.75v1.5z" />
-                        </svg>
-                        OPEN TO WORK
+                          <span className={styles.HireBadgeIconHandle} />
+                          <span className={styles.HireBadgeIconSeam} />
+                        </span>
+                        <span className={styles.HireBadgeText}>
+                          OPEN TO WORK
+                        </span>
                       </span>
                     </div>
                   )}
