@@ -162,11 +162,19 @@ jobs:
                 }
               }
             `;
-            await github.graphql(mutation, {
-              pullRequestId: afterApproval.node_id,
-              expectedHeadOid: headSha,
-            });
-            core.info(`Enabled squash auto-merge for PR #${pr.number} at ${headSha}.`);
+            try {
+              await github.graphql(mutation, {
+                pullRequestId: afterApproval.node_id,
+                expectedHeadOid: headSha,
+              });
+              core.info(`Enabled squash auto-merge for PR #${pr.number} at ${headSha}.`);
+            } catch (err) {
+              if (isAutoMergeDisabledError(err)) {
+                core.warning('Auto-merge is not allowed for this repository; leaving the approved PR for manual merge.');
+                return;
+              }
+              throw err;
+            }
 
             function validateWorkflowRun(workflowRun, workflowRunPr) {
               if (workflowRun.name !== 'Dependabot auto-merge' ||
@@ -229,9 +237,6 @@ jobs:
             }
 
             function validateNonMajorUpdate(metadata) {
-              if (metadata.maintainerChanges !== 'false') {
-                throw new Error('Dependabot metadata must explicitly report no maintainer changes.');
-              }
               if (typeof metadata.updateType !== 'string' || metadata.updateType.length === 0) {
                 throw new Error('Dependabot update type is missing.');
               }
@@ -241,6 +246,13 @@ jobs:
               }
               if (!/^version-update:semver-(minor|patch)$/.test(metadata.updateType)) {
                 throw new Error(`Unsupported Dependabot update type: ${metadata.updateType}`);
+              }
+              if (metadata.maintainerChanges !== 'false' && metadata.maintainerChanges !== 'true') {
+                throw new Error(`Unexpected Dependabot maintainer-changes value: ${metadata.maintainerChanges}`);
+              }
+              if (metadata.maintainerChanges === 'true') {
+                core.info('Dependabot reports maintainer changes; skipping auto-approval and auto-merge.');
+                return false;
               }
               if (typeof metadata.updatedDependenciesJson !== 'string') {
                 throw new Error('Dependabot updated dependencies metadata is missing.');
@@ -266,8 +278,35 @@ jobs:
                 if (typeof depUpdateType !== 'string' || !/^version-update:semver-(minor|patch)$/.test(depUpdateType)) {
                   throw new Error(`Unsupported dependency update type: ${depUpdateType}`);
                 }
+                const depMaintainerChanges = dep['maintainer-changes'] ?? dep.maintainerChanges;
+                if (depMaintainerChanges === true || depMaintainerChanges === 'true') {
+                  core.info(`Dependency ${dep['dependency-name'] || dep.dependencyName || '<unknown>'} reports maintainer changes; skipping auto-approval and auto-merge.`);
+                  return false;
+                }
               }
               return dependencies;
+            }
+
+            function isAutoMergeDisabledError(err) {
+              const messages = [];
+              if (err && typeof err.message === 'string') {
+                messages.push(err.message);
+              }
+              if (Array.isArray(err && err.errors)) {
+                for (const error of err.errors) {
+                  if (error && typeof error.message === 'string') {
+                    messages.push(error.message);
+                  }
+                }
+              }
+              if (err && err.response && Array.isArray(err.response.errors)) {
+                for (const error of err.response.errors) {
+                  if (error && typeof error.message === 'string') {
+                    messages.push(error.message);
+                  }
+                }
+              }
+              return messages.some((message) => message.includes('Auto merge is not allowed for this repository'));
             }
 
             function formatDependencySummary(dependencies) {
