@@ -18,6 +18,7 @@ import { Checkbox, PrimerSelect } from "./ui/FormControls";
 import { Button } from "./ui/Button";
 import styles from "./DevemonCard.module.css";
 import sharedStyles from "./shared.module.css";
+import { downloadElementAsPng, elementToPngBlob } from "../utils/domExport";
 
 interface DevemonCardProps {
   user: GitHubUser;
@@ -192,24 +193,10 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!targetRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(targetRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
-
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `devemon-${format}-${user.login}.png`;
-            link.click();
-            URL.revokeObjectURL(url);
-          }
-        }, "image/png");
+        await downloadElementAsPng(
+          targetRef.current,
+          `devemon-${format}-${user.login}.png`
+        );
       } catch (error) {
         console.error("Failed to download card:", error);
       }
@@ -222,43 +209,35 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!cardRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(cardRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
+        const blob = await elementToPngBlob(cardRef.current);
 
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
+        if (blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": blob }),
+            ]);
 
-              alert(
-                "✅ Devémon card copied to clipboard! You can now paste it in your tweet."
-              );
+            alert(
+              "✅ Devémon card copied to clipboard! You can now paste it in your tweet."
+            );
 
-              const tweetText =
-                "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
-              const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                tweetText
-              )}`;
-              window.open(
-                twitterUrl,
-                "twitter-share-dialog",
-                "width=626,height=436"
-              );
-            } catch (error) {
-              console.error("Error copying to clipboard:", error);
-              alert(
-                "Failed to copy card to clipboard. Please download it manually."
-              );
-            }
+            const tweetText =
+              "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+              tweetText
+            )}`;
+            window.open(
+              twitterUrl,
+              "twitter-share-dialog",
+              "width=626,height=436"
+            );
+          } catch (error) {
+            console.error("Error copying to clipboard:", error);
+            alert(
+              "Failed to copy card to clipboard. Please download it manually."
+            );
           }
-        }, "image/png");
+        }
       } catch (error) {
         console.error("Error sharing to Twitter:", error);
         alert("Failed to generate card image. Please try again.");
@@ -272,43 +251,35 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!cardRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(cardRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
+        const blob = await elementToPngBlob(cardRef.current);
 
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
+        if (blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": blob }),
+            ]);
 
-              alert(
-                "✅ Devémon card copied to clipboard! You can now paste it in your Bluesky post."
-              );
+            alert(
+              "✅ Devémon card copied to clipboard! You can now paste it in your Bluesky post."
+            );
 
-              const postText =
-                "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
-              const blueskyUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(
-                postText
-              )}`;
-              window.open(
-                blueskyUrl,
-                "bluesky-share-dialog",
-                "width=626,height=600"
-              );
-            } catch (error) {
-              console.error("Error copying to clipboard:", error);
-              alert(
-                "Failed to copy card to clipboard. Please download it manually."
-              );
-            }
+            const postText =
+              "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
+            const blueskyUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(
+              postText
+            )}`;
+            window.open(
+              blueskyUrl,
+              "bluesky-share-dialog",
+              "width=626,height=600"
+            );
+          } catch (error) {
+            console.error("Error copying to clipboard:", error);
+            alert(
+              "Failed to copy card to clipboard. Please download it manually."
+            );
           }
-        }, "image/png");
+        }
       } catch (error) {
         console.error("Error sharing to Bluesky:", error);
         alert("Failed to generate card image. Please try again.");
@@ -322,43 +293,35 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!cardRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(cardRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
+        const blob = await elementToPngBlob(cardRef.current);
 
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
+        if (blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": blob }),
+            ]);
 
-              alert(
-                "✅ Devémon card copied to clipboard! You can now paste it in your Threads post."
-              );
+            alert(
+              "✅ Devémon card copied to clipboard! You can now paste it in your Threads post."
+            );
 
-              const postText =
-                "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
-              const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(
-                postText
-              )}`;
-              window.open(
-                threadsUrl,
-                "threads-share-dialog",
-                "width=626,height=600"
-              );
-            } catch (error) {
-              console.error("Error copying to clipboard:", error);
-              alert(
-                "Failed to copy card to clipboard. Please download it manually."
-              );
-            }
+            const postText =
+              "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
+            const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(
+              postText
+            )}`;
+            window.open(
+              threadsUrl,
+              "threads-share-dialog",
+              "width=626,height=600"
+            );
+          } catch (error) {
+            console.error("Error copying to clipboard:", error);
+            alert(
+              "Failed to copy card to clipboard. Please download it manually."
+            );
           }
-        }, "image/png");
+        }
       } catch (error) {
         console.error("Error sharing to Threads:", error);
         alert("Failed to generate card image. Please try again.");
@@ -372,41 +335,33 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!cardRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(cardRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
+        const blob = await elementToPngBlob(cardRef.current);
 
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
+        if (blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": blob }),
+            ]);
 
-              alert(
-                "✅ Devémon card copied to clipboard!\n\n📱 To share on Instagram:\n1. Open the Instagram app on your device\n2. Tap the + button to create a new post\n3. Paste the image from your clipboard\n4. Add your caption and share!"
+            alert(
+              "✅ Devémon card copied to clipboard!\n\n📱 To share on Instagram:\n1. Open the Instagram app on your device\n2. Tap the + button to create a new post\n3. Paste the image from your clipboard\n4. Add your caption and share!"
+            );
+
+            window.location.href = "instagram://library";
+            setTimeout(() => {
+              window.open(
+                "https://www.instagram.com/",
+                "instagram-share",
+                "width=626,height=600"
               );
-
-              window.location.href = "instagram://library";
-              setTimeout(() => {
-                window.open(
-                  "https://www.instagram.com/",
-                  "instagram-share",
-                  "width=626,height=600"
-                );
-              }, 1500);
-            } catch (error) {
-              console.error("Error copying to clipboard:", error);
-              alert(
-                "Failed to copy card to clipboard. Please download it manually."
-              );
-            }
+            }, 1500);
+          } catch (error) {
+            console.error("Error copying to clipboard:", error);
+            alert(
+              "Failed to copy card to clipboard. Please download it manually."
+            );
           }
-        }, "image/png");
+        }
       } catch (error) {
         console.error("Error sharing to Instagram:", error);
         alert("Failed to generate card image. Please try again.");
@@ -432,6 +387,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
         <div className={styles.PreviewSection}>
           <div
             ref={cardRef}
+            data-devemon-card="true"
             className={styles.Card}
             style={{
               background: `linear-gradient(135deg, ${rarityInfo.color}15, ${rarityInfo.color}30)`,
@@ -465,9 +421,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                       color: rarityInfo.color,
                     }}
                   >
-                    <span className={styles.RarityBadgeText}>
-                      {rarityInfo.name.toUpperCase()}
-                    </span>
+                    {rarityInfo.name.toUpperCase()}
                   </span>
                 </div>
               </div>
@@ -499,14 +453,13 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         data-open-to-work-badge="true"
                         className={styles.HireBadge}
                       >
-                        <span
-                          aria-hidden="true"
-                          data-briefcase-icon="true"
+                        <Icon
+                          name="briefcase"
+                          size={12}
+                          color="currentColor"
+                          label=""
                           className={styles.HireBadgeIcon}
-                        >
-                          <span className={styles.HireBadgeIconHandle} />
-                          <span className={styles.HireBadgeIconSeam} />
-                        </span>
+                        />
                         <span className={styles.HireBadgeText}>
                           OPEN TO WORK
                         </span>
@@ -528,7 +481,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Repositories"
                       />
-                      <span className={styles.StatLabelText}>Repositories</span>
+                      Repositories
                     </div>
                     <div className={styles.StatValue}>{user.public_repos}</div>
                   </div>
@@ -540,7 +493,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Followers"
                       />
-                      <span className={styles.StatLabelText}>Followers</span>
+                      Followers
                     </div>
                     <div className={styles.StatValue}>{user.followers}</div>
                   </div>
@@ -552,7 +505,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Stars"
                       />
-                      <span className={styles.StatLabelText}>Stars</span>
+                      Stars
                     </div>
                     <div className={styles.StatValue}>
                       {extendedStats.totalStars}
@@ -566,7 +519,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Forks"
                       />
-                      <span className={styles.StatLabelText}>Forks</span>
+                      Forks
                     </div>
                     <div className={styles.StatValue}>
                       {extendedStats.totalForks}
@@ -583,7 +536,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                       color="currentColor"
                       label="Contributions"
                     />
-                    <span className={styles.StatLabelText}>Contributions</span>
+                    Contributions
                   </div>
                   <div className={styles.StatValue}>
                     {user.contributions?.totalContributions || 0}
@@ -600,9 +553,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Languages"
                       />
-                      <span className={styles.StatLabelText}>
                       Languages Mastered
-                      </span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {extendedStats.topLanguages.map((lang) => (
@@ -619,8 +570,8 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
               </div>
 
               {/* Footer */}
-              <div className={styles.CardFooter}>
-                <p className={styles.CardFooterText}>
+              <div className="mt-3 pt-2.5 border-t borderColor-muted text-center">
+                <p className="text-xs text-gray-400 font-mono">
                   Developer since {formattedDate}
                 </p>
               </div>
@@ -811,14 +762,11 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                           display: "inline-flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          gap: "4px",
                           padding: "0 8px",
                           height: "24px",
-                          boxSizing: "border-box",
                           fontFamily: "monospace",
                           fontWeight: "500",
                           fontSize: "9px",
-                          lineHeight: "1",
                           textTransform: "uppercase",
                           letterSpacing: "0.05em",
                           borderRadius: "4px",
@@ -829,17 +777,19 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
                         }}
                       >
-                        <span
-                          aria-hidden="true"
-                          data-briefcase-icon="true"
-                          className={styles.HireBadgeIcon}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 16 16"
+                          fill="currentColor"
+                          style={{
+                            width: "12px",
+                            height: "12px",
+                            marginRight: "4px",
+                          }}
                         >
-                          <span className={styles.HireBadgeIconHandle} />
-                          <span className={styles.HireBadgeIconSeam} />
-                        </span>
-                        <span className={styles.HireBadgeText}>
-                          OPEN TO WORK
-                        </span>
+                          <path d="M7.5 1.75C7.5.784 8.284 0 9.25 0h5.5c.966 0 1.75.784 1.75 1.75v11.5A1.75 1.75 0 0 1 14.75 15h-5.5a1.75 1.75 0 0 1-1.75-1.75V1.75zm1.75-.25a.25.25 0 0 0-.25.25v11.5c0 .138.112.25.25.25h5.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25h-5.5zM4.943 9.25A.75.75 0 0 1 4 8.5h-.2a1.55 1.55 0 0 0-1.55 1.55v5.2c0 .856.694 1.55 1.55 1.55h.2a.75.75 0 0 1 0 1.5h-.2A3.05 3.05 0 0 1 .75 15.25v-5.2A3.05 3.05 0 0 1 3.8 7h.2a.75.75 0 0 1 .75.75v1.5z" />
+                        </svg>
+                        OPEN TO WORK
                       </span>
                     </div>
                   )}
