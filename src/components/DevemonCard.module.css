@@ -70,7 +70,7 @@
   font-weight: bold;
   color: white;
   font-family: var(--font-family-mono);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   line-height: 1.25;
 }
 
@@ -110,7 +110,7 @@
 .RarityBadgeText {
   display: block;
   line-height: 1;
-  transform: translateY(-5px);
+  transform: translateY(-4px);
 }
 
 /* Avatar Section */

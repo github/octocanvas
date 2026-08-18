@@ -88,6 +88,17 @@ test("Devemon downloads keep the Open to Work badge aligned", async ({
     "color",
     "rgb(1, 4, 9)"
   );
+  const headerSpacing = await page.evaluate(() => {
+    const username = document.querySelector('[class*="Username"]');
+    const rarity = document.querySelector('[class*="RarityBadge"]');
+    const usernameRect = username?.getBoundingClientRect();
+    const rarityRect = rarity?.getBoundingClientRect();
+
+    return usernameRect && rarityRect
+      ? rarityRect.top - usernameRect.bottom
+      : Number.NaN;
+  });
+  expect(headerSpacing).toBeGreaterThanOrEqual(6);
 
   const exportBadgeMetrics = await page.evaluate(() => {
     const exportBadge = [...document.querySelectorAll("span")].find(
