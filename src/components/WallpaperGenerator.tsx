@@ -13,6 +13,12 @@ import { forwardRef } from "preact/compat";
 import type { GitHubUser } from "./GitHubWallpaperApp";
 import styles from "./WallpaperGenerator.module.css";
 import sharedStyles from "./shared.module.css";
+import {
+  copyPngBlobToClipboard,
+  downloadBlob,
+  svgToPngBlob,
+  yieldToBrowser,
+} from "../utils/imageExport";
 
 interface WallpaperGeneratorProps {
   user: GitHubUser;
@@ -865,7 +871,7 @@ const WallpaperGenerator = forwardRef<
    * Convert SVG to PNG blob (for clipboard or download)
    * Reusable function for both download and share operations
    */
-  const copyToClipboard = async (
+  const createWallpaperPngBlob = async (
     sizeKey: SizeKey = "desktop"
   ): Promise<Blob> => {
     const size = SIZES[sizeKey];
@@ -876,63 +882,9 @@ const WallpaperGenerator = forwardRef<
       throw new Error("Avatar not loaded yet");
     }
 
+    await yieldToBrowser();
     const svgString = generateSVG(size.width, size.height, true); // true = static version
-
-    // Create canvas for PNG conversion
-    const canvas = document.createElement("canvas");
-    canvas.width = size.width;
-    canvas.height = size.height;
-    const ctx = canvas.getContext("2d", { willReadFrequently: false });
-
-    if (!ctx) {
-      throw new Error("Failed to get canvas context");
-    }
-
-    // Encode SVG string properly for data URL
-    const encodedSvg = encodeURIComponent(svgString)
-      .replace(/'/g, "%27")
-      .replace(/"/g, "%22");
-
-    const dataUrl = `data:image/svg+xml,${encodedSvg}`;
-
-    // Create image and wait for it to load
-    const img = new Image();
-
-    await new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error("Image load timeout after 10 seconds"));
-      }, 10000); // 10 second timeout
-
-      img.onload = () => {
-        clearTimeout(timeout);
-        resolve();
-      };
-
-      img.onerror = (e) => {
-        clearTimeout(timeout);
-        console.error("Failed to load SVG image:", e);
-        reject(new Error("Failed to load SVG image"));
-      };
-
-      img.src = dataUrl;
-    });
-
-    // Draw the SVG image onto canvas
-    ctx.drawImage(img, 0, 0);
-
-    // Convert canvas to PNG blob
-    const blob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob(
-        (b) => {
-          if (b) resolve(b);
-          else reject(new Error("Failed to create blob from canvas"));
-        },
-        "image/png",
-        1.0
-      );
-    });
-
-    return blob;
+    return svgToPngBlob(svgString, size.width, size.height);
   };
 
   /**
@@ -943,20 +895,8 @@ const WallpaperGenerator = forwardRef<
     setDownloadingSize(sizeKey);
 
     try {
-      const blob = await copyToClipboard(sizeKey);
-
-      const pngUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = pngUrl;
-      link.download = `github-wallpaper-${user.login}-${sizeKey}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Clean up
-      setTimeout(() => {
-        URL.revokeObjectURL(pngUrl);
-      }, 100);
+      const blob = await createWallpaperPngBlob(sizeKey);
+      downloadBlob(blob, `github-wallpaper-${user.login}-${sizeKey}.png`);
 
       console.log(`Successfully downloaded ${sizeKey} wallpaper`);
     } catch (error) {
@@ -970,13 +910,21 @@ const WallpaperGenerator = forwardRef<
     }
   };
 
-  /**
-   * Share wallpaper to Twitter/X
-   * Copies desktop wallpaper to clipboard and opens Twitter with pre-filled text
-   */
-  const handleTwitterShare = async () => {
-    // Check if avatar is loaded before proceeding
-    // Use ref to get current value (not closure value)
+  const copyDesktopWallpaperAndShare = async ({
+    successMessage,
+    failureMessage,
+    shareUrl,
+    windowName,
+    windowFeatures,
+    afterShare,
+  }: {
+    successMessage: string;
+    failureMessage: string;
+    shareUrl?: string;
+    windowName: string;
+    windowFeatures: string;
+    afterShare?: () => void;
+  }) => {
     const currentAvatarBase64 = avatarBase64Ref.current;
     if (!currentAvatarBase64) {
       alert(
@@ -986,44 +934,38 @@ const WallpaperGenerator = forwardRef<
     }
 
     try {
-      // Copy wallpaper to clipboard first
-      const blob = await copyToClipboard("desktop");
-
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          "image/png": blob,
-        }),
-      ]);
-
-      // Show success message
-      alert(
-        "✅ Wallpaper copied to clipboard! You can now paste it in your tweet."
-      );
-
-      // Open Twitter with pre-filled text
-      const tweetText = SHARE_POST_TEXT;
-      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        tweetText
-      )}`;
-
-      window.open(
-        twitterUrl,
-        "twitter-share-dialog",
-        "width=626,height=436,toolbar=0,menubar=0,location=0,status=0"
-      );
+      const blob = await createWallpaperPngBlob("desktop");
+      await copyPngBlobToClipboard(blob);
+      alert(successMessage);
     } catch (error) {
-      console.error("Error sharing to Twitter:", error);
-      alert(
-        "Failed to copy wallpaper to clipboard. Please download it manually and attach to your tweet."
-      );
-
-      // Still open Twitter even if clipboard fails
-      const tweetText = SHARE_POST_TEXT;
-      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        tweetText
-      )}`;
-      window.open(twitterUrl, "twitter-share-dialog", "width=626,height=436");
+      console.error(`Error preparing wallpaper for ${windowName}:`, error);
+      alert(failureMessage);
+    } finally {
+      if (shareUrl) {
+        window.open(shareUrl, windowName, windowFeatures);
+      }
+      afterShare?.();
     }
+  };
+
+  /**
+   * Share wallpaper to Twitter/X
+   * Copies desktop wallpaper to clipboard and opens Twitter with pre-filled text
+   */
+  const handleTwitterShare = async () => {
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      SHARE_POST_TEXT
+    )}`;
+
+    await copyDesktopWallpaperAndShare({
+      successMessage:
+        "✅ Wallpaper copied to clipboard! You can now paste it in your tweet.",
+      failureMessage:
+        "Failed to copy wallpaper to clipboard. Please download it manually and attach to your tweet.",
+      shareUrl: twitterUrl,
+      windowName: "twitter-share-dialog",
+      windowFeatures: "width=626,height=436,toolbar=0,menubar=0,location=0,status=0",
+    });
   };
 
   /**
@@ -1044,32 +986,15 @@ const WallpaperGenerator = forwardRef<
       postText
     )}`;
 
-    try {
-      const blob = await copyToClipboard("desktop");
-
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          "image/png": blob,
-        }),
-      ]);
-
-      alert(
-        "✅ Wallpaper copied to clipboard! You can now paste it in your Bluesky post."
-      );
-
-      window.open(
-        blueskyUrl,
-        "bluesky-share-dialog",
-        "width=626,height=600,toolbar=0,menubar=0,location=0,status=0"
-      );
-    } catch (error) {
-      console.error("Error sharing to Bluesky:", error);
-      alert(
-        "Failed to copy wallpaper to clipboard. Please download it manually and attach to your post."
-      );
-
-      window.open(blueskyUrl, "bluesky-share-dialog", "width=626,height=600");
-    }
+    await copyDesktopWallpaperAndShare({
+      successMessage:
+        "✅ Wallpaper copied to clipboard! You can now paste it in your Bluesky post.",
+      failureMessage:
+        "Failed to copy wallpaper to clipboard. Please download it manually and attach to your post.",
+      shareUrl: blueskyUrl,
+      windowName: "bluesky-share-dialog",
+      windowFeatures: "width=626,height=600,toolbar=0,menubar=0,location=0,status=0",
+    });
   };
 
   /**
@@ -1090,32 +1015,15 @@ const WallpaperGenerator = forwardRef<
       postText
     )}`;
 
-    try {
-      const blob = await copyToClipboard("desktop");
-
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          "image/png": blob,
-        }),
-      ]);
-
-      alert(
-        "✅ Wallpaper copied to clipboard! You can now paste it in your Threads post."
-      );
-
-      window.open(
-        threadsUrl,
-        "threads-share-dialog",
-        "width=626,height=600,toolbar=0,menubar=0,location=0,status=0"
-      );
-    } catch (error) {
-      console.error("Error sharing to Threads:", error);
-      alert(
-        "Failed to copy wallpaper to clipboard. Please download it manually and attach to your post."
-      );
-
-      window.open(threadsUrl, "threads-share-dialog", "width=626,height=600");
-    }
+    await copyDesktopWallpaperAndShare({
+      successMessage:
+        "✅ Wallpaper copied to clipboard! You can now paste it in your Threads post.",
+      failureMessage:
+        "Failed to copy wallpaper to clipboard. Please download it manually and attach to your post.",
+      shareUrl: threadsUrl,
+      windowName: "threads-share-dialog",
+      windowFeatures: "width=626,height=600,toolbar=0,menubar=0,location=0,status=0",
+    });
   };
 
   /**
@@ -1123,31 +1031,9 @@ const WallpaperGenerator = forwardRef<
    * Copies desktop wallpaper to clipboard and shows instructions for Instagram app
    */
   const handleInstagramShare = async () => {
-    const currentAvatarBase64 = avatarBase64Ref.current;
-    if (!currentAvatarBase64) {
-      alert(
-        "⏳ Please wait - your avatar is still loading. Try again in a moment!"
-      );
-      return;
-    }
-
-    try {
-      const blob = await copyToClipboard("desktop");
-
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          "image/png": blob,
-        }),
-      ]);
-
-      alert(
-        "✅ Wallpaper copied to clipboard!\n\n📱 To share on Instagram:\n1. Open the Instagram app on your device\n2. Tap the + button to create a new post\n3. Paste the image from your clipboard\n4. Add your caption and share!"
-      );
-
-      // Try to open Instagram app (works on mobile devices)
+    const openInstagram = () => {
       window.location.href = "instagram://library";
 
-      // Fallback to web after a delay (if app doesn't open)
       setTimeout(() => {
         window.open(
           "https://www.instagram.com/",
@@ -1155,22 +1041,17 @@ const WallpaperGenerator = forwardRef<
           "width=626,height=600"
         );
       }, 1500);
-    } catch (error) {
-      console.error("Error sharing to Instagram:", error);
-      alert(
-        "Failed to copy wallpaper to clipboard. Please download it manually and upload to Instagram."
-      );
+    };
 
-      // Still try to open Instagram
-      window.location.href = "instagram://library";
-      setTimeout(() => {
-        window.open(
-          "https://www.instagram.com/",
-          "instagram-share",
-          "width=626,height=600"
-        );
-      }, 1500);
-    }
+    await copyDesktopWallpaperAndShare({
+      successMessage:
+        "✅ Wallpaper copied to clipboard!\n\n📱 To share on Instagram:\n1. Open the Instagram app on your device\n2. Tap the + button to create a new post\n3. Paste the image from your clipboard\n4. Add your caption and share!",
+      failureMessage:
+        "Failed to copy wallpaper to clipboard. Please download it manually and upload to Instagram.",
+      windowName: "instagram-share",
+      windowFeatures: "width=626,height=600",
+      afterShare: openInstagram,
+    });
   };
 
   // Generate responsive preview SVG based on screen size

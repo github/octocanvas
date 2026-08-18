@@ -17,6 +17,8 @@
  * construction rather than by per-element pixel nudging.
  */
 
+import { canvasToPngBlob, downloadBlob, yieldToBrowser } from "./imageExport";
+
 /** Default scale so downloads stay crisp on hi-dpi displays. */
 export const DEFAULT_EXPORT_SCALE = 3;
 
@@ -32,6 +34,8 @@ export async function elementToCanvas(
   element: HTMLElement,
   { scale = DEFAULT_EXPORT_SCALE }: ExportOptions = {},
 ): Promise<HTMLCanvasElement> {
+  await yieldToBrowser();
+
   const { domToCanvas } = await import("modern-screenshot");
 
   return domToCanvas(element, {
@@ -46,12 +50,18 @@ export async function elementToCanvas(
 export async function elementToPngBlob(
   element: HTMLElement,
   options: ExportOptions = {},
-): Promise<Blob | null> {
-  const canvas = await elementToCanvas(element, options);
+): Promise<Blob> {
+  let canvas: HTMLCanvasElement | undefined;
 
-  return new Promise<Blob | null>((resolve) => {
-    canvas.toBlob((blob) => resolve(blob), "image/png");
-  });
+  try {
+    canvas = await elementToCanvas(element, options);
+    return await canvasToPngBlob(canvas);
+  } finally {
+    if (canvas) {
+      canvas.width = 0;
+      canvas.height = 0;
+    }
+  }
 }
 
 /**
@@ -63,12 +73,5 @@ export async function downloadElementAsPng(
   options: ExportOptions = {},
 ): Promise<void> {
   const blob = await elementToPngBlob(element, options);
-  if (!blob) return;
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  link.click();
-  URL.revokeObjectURL(url);
+  downloadBlob(blob, fileName);
 }

@@ -16,6 +16,7 @@
 // @ts-nocheck
 
 import { useState, useRef } from "preact/hooks";
+import { flushSync } from "preact/compat";
 import type { JSX } from "preact";
 import WallpaperGenerator, {
   type WallpaperGeneratorRef,
@@ -79,6 +80,7 @@ export default function GitHubWallpaperApp() {
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState(0);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [busyAction, setBusyAction] = useState<string | null>(null);
 
   // Wallpaper form controls
   const [wallpaperTheme, setWallpaperTheme] = useState<
@@ -113,6 +115,30 @@ export default function GitHubWallpaperApp() {
     { label: "Devémon Card", shortLabel: "Devémon" },
     { label: "README Banner", shortLabel: "Banner" },
   ];
+
+  const runAction = async (actionId: string, action?: () => void | Promise<void>) => {
+    if (!action || busyAction) return;
+
+    const minimumBusyMs = actionId === "banner-markdown" ? 0 : 500;
+    const startedAt = performance.now();
+    flushSync(() => {
+      setBusyAction(actionId);
+    });
+    try {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+      await action();
+    } finally {
+      const remainingBusyMs = minimumBusyMs - (performance.now() - startedAt);
+      if (remainingBusyMs > 0) {
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, remainingBusyMs);
+        });
+      }
+      setBusyAction(null);
+    }
+  };
 
   // Support left/right arrow key navigation (adapted from Universe Tickets)
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -593,6 +619,8 @@ export default function GitHubWallpaperApp() {
           {selectedTab === 0 && (
             <ActionButtonsArea
               actionType="wallpaper"
+              busyAction={busyAction}
+              onRunAction={runAction}
               onDownloadDesktop={() =>
                 wallpaperGeneratorRef.current?.downloadWallpaper("desktop")
               }
@@ -620,6 +648,8 @@ export default function GitHubWallpaperApp() {
           {selectedTab === 1 && (
             <ActionButtonsArea
               actionType="devemon"
+              busyAction={busyAction}
+              onRunAction={runAction}
               onDownloadCard={() =>
                 devemonCardRef.current?.downloadCard("card")
               }
@@ -644,6 +674,8 @@ export default function GitHubWallpaperApp() {
           {selectedTab === 2 && (
             <ActionButtonsArea
               actionType="banner"
+              busyAction={busyAction}
+              onRunAction={runAction}
               onDownloadBanner={() => readmeBannerRef.current?.downloadBanner()}
               onCopyMarkdown={() => readmeBannerRef.current?.copyMarkdown()}
               onShareTwitter={() =>
