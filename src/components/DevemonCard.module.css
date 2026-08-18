@@ -110,7 +110,7 @@
 .RarityBadgeText {
   display: block;
   line-height: 1;
-  transform: translateY(-3px);
+  transform: translateY(-5px);
 }
 
 /* Avatar Section */
@@ -164,7 +164,7 @@
   letter-spacing: 0.05em;
   border-radius: 0.25rem;
   background-color: var(--color-brand-primary);
-  color: var(--color-brand-on-primary);
+  color: var(--color-bg-primary);
   border: 2px solid var(--color-bg-primary);
   white-space: nowrap;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);

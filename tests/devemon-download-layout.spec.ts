@@ -84,6 +84,10 @@ test("Devemon downloads keep the Open to Work badge aligned", async ({
   await page.locator("label", { hasText: "Available for Hire" }).click();
   await expect(page.locator('[class*="RarityBadgeText"]')).toBeVisible();
   await expect(page.locator('[class*="StatLabelText"]')).toHaveCount(6);
+  await expect(page.locator('[data-open-to-work-badge="true"]')).toHaveCSS(
+    "color",
+    "rgb(1, 4, 9)"
+  );
 
   const exportBadgeMetrics = await page.evaluate(() => {
     const exportBadge = [...document.querySelectorAll("span")].find(

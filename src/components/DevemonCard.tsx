@@ -495,7 +495,10 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                   {/* Available for Hire Badge */}
                   {availableForHire && (
                     <div className={styles.HireBadgeContainer}>
-                      <span className={styles.HireBadge}>
+                      <span
+                        data-open-to-work-badge="true"
+                        className={styles.HireBadge}
+                      >
                         <span
                           aria-hidden="true"
                           data-briefcase-icon="true"
