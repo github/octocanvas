@@ -79,28 +79,32 @@ export const svgToPngBlob = async (
   const svgBlob = new Blob([svgString], {
     type: "image/svg+xml;charset=utf-8",
   });
-  const image = await loadSvgBlobIntoImage(svgBlob);
-
-  await yieldToBrowser();
-
+  let image: ImageBitmap | HTMLImageElement | undefined;
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
 
-  const context = canvas.getContext("2d", { willReadFrequently: false });
-  if (!context) {
-    throw new Error("Failed to get canvas context");
+  try {
+    image = await loadSvgBlobIntoImage(svgBlob);
+
+    await yieldToBrowser();
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d", { willReadFrequently: false });
+    if (!context) {
+      throw new Error("Failed to get canvas context");
+    }
+
+    context.drawImage(image, 0, 0, width, height);
+    return await canvasToPngBlob(canvas);
+  } finally {
+    if (image && "close" in image && typeof image.close === "function") {
+      image.close();
+    }
+
+    canvas.width = 0;
+    canvas.height = 0;
   }
-
-  context.drawImage(image, 0, 0, width, height);
-  if ("close" in image && typeof image.close === "function") {
-    image.close();
-  }
-
-  const blob = await canvasToPngBlob(canvas);
-  canvas.width = 0;
-  canvas.height = 0;
-  return blob;
 };
 
 export const captureElementToPngBlob = async (
@@ -110,15 +114,21 @@ export const captureElementToPngBlob = async (
   await yieldToBrowser();
 
   const html2canvas = (await import("html2canvas")).default;
-  const canvas = await html2canvas(element, {
-    logging: false,
-    ...options,
-  });
-  const blob = await canvasToPngBlob(canvas);
+  let canvas: HTMLCanvasElement | undefined;
 
-  canvas.width = 0;
-  canvas.height = 0;
-  return blob;
+  try {
+    canvas = await html2canvas(element, {
+      logging: false,
+      ...options,
+    });
+
+    return await canvasToPngBlob(canvas);
+  } finally {
+    if (canvas) {
+      canvas.width = 0;
+      canvas.height = 0;
+    }
+  }
 };
 
 export const downloadBlob = (blob: Blob, filename: string) => {

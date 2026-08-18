@@ -4,6 +4,7 @@ const avatarPng = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
   "base64"
 );
+const interactionTimeoutMs = 750;
 
 async function mockGitHubProfile(page: Page) {
   await page.route("**/users/octocat", async (route) => {
@@ -80,6 +81,13 @@ async function loadGeneratedProfile(page: Page) {
       },
     });
 
+    (window as typeof window & { __octocanvasTicks: number })
+      .__octocanvasTicks = 0;
+    window.setInterval(() => {
+      (window as typeof window & { __octocanvasTicks: number })
+        .__octocanvasTicks += 1;
+    }, 50);
+
     const originalToBlob = HTMLCanvasElement.prototype.toBlob;
     HTMLCanvasElement.prototype.toBlob = function delayedToBlob(
       callback,
@@ -88,7 +96,7 @@ async function loadGeneratedProfile(page: Page) {
     ) {
       return originalToBlob.call(
         this,
-        (blob) => window.setTimeout(() => callback(blob), 300),
+        (blob) => window.setTimeout(() => callback(blob), 1000),
         type,
         quality
       );
@@ -121,14 +129,50 @@ async function expectNoGenerationFailureAlert(page: Page) {
   expect(alerts).not.toContain("Failed to generate card image. Please try again.");
 }
 
+async function expectResponsiveInteraction(
+  page: Page,
+  action: () => Promise<unknown>,
+  description: string
+) {
+  const startingTicks = await page.evaluate(
+    () =>
+      (window as typeof window & { __octocanvasTicks: number })
+        .__octocanvasTicks
+  );
+  const startedAt = Date.now();
+
+  await action();
+
+  expect(
+    Date.now() - startedAt,
+    `${description} should not wait for image generation to finish`
+  ).toBeLessThan(interactionTimeoutMs);
+
+  await page.waitForFunction(
+    (ticks) =>
+      (window as typeof window & { __octocanvasTicks: number })
+        .__octocanvasTicks > ticks,
+    startingTicks,
+    { timeout: interactionTimeoutMs }
+  );
+}
+
 test("wallpaper sharing keeps the rest of the page interactive", async ({
   page,
 }) => {
   await loadGeneratedProfile(page);
 
-  await page.getByRole("button", { name: "Twitter/X" }).click();
+  await expectResponsiveInteraction(
+    page,
+    () => page.getByRole("button", { name: "Twitter/X" }).click(),
+    "Wallpaper share click"
+  );
   const devemonTab = page.getByRole("tab", { name: "Devémon Card" });
-  await devemonTab.click();
+  await expectResponsiveInteraction(
+    page,
+    () => devemonTab.click(),
+    "Tab switch during wallpaper share"
+  );
 
   await expect(devemonTab).toHaveAttribute("aria-selected", "true");
 });
@@ -138,9 +182,17 @@ test("wallpaper downloads keep the rest of the page interactive", async ({
 }) => {
   await loadGeneratedProfile(page);
 
-  await page.getByRole("button", { name: /Desktop/ }).click();
+  await expectResponsiveInteraction(
+    page,
+    () => page.getByRole("button", { name: /Desktop/ }).click(),
+    "Wallpaper download click"
+  );
   const devemonTab = page.getByRole("tab", { name: "Devémon Card" });
-  await devemonTab.click();
+  await expectResponsiveInteraction(
+    page,
+    () => devemonTab.click(),
+    "Tab switch during wallpaper download"
+  );
 
   await expect(devemonTab).toHaveAttribute("aria-selected", "true");
 });
@@ -162,9 +214,17 @@ test("devemon card sharing keeps the rest of the page interactive", async ({
   await loadGeneratedProfile(page);
   await showDevemonCard(page);
 
-  await page.getByRole("button", { name: "Twitter/X" }).click();
+  await expectResponsiveInteraction(
+    page,
+    () => page.getByRole("button", { name: "Twitter/X" }).click(),
+    "Devémon share click"
+  );
   const bannerTab = page.getByRole("tab", { name: "README Banner" });
-  await bannerTab.click();
+  await expectResponsiveInteraction(
+    page,
+    () => bannerTab.click(),
+    "Tab switch during Devémon share"
+  );
 
   await expect(bannerTab).toHaveAttribute("aria-selected", "true");
 });

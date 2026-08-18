@@ -32,6 +32,9 @@ export interface ButtonProps {
   /** Disabled state */
   disabled?: boolean;
 
+  /** Busy state for assistive technology */
+  ariaBusy?: boolean;
+
   /** Full width button */
   fullWidth?: boolean;
 
@@ -49,6 +52,7 @@ export function Button({
   onClick,
   type = "button",
   disabled = false,
+  ariaBusy = false,
   fullWidth = false,
   className = "",
   icon,
@@ -70,6 +74,7 @@ export function Button({
       className={buttonClasses}
       onClick={onClick}
       disabled={disabled}
+      aria-busy={ariaBusy || undefined}
     >
       {/* Button text with GitHub Universe styling */}
       <span>{children}</span>
