@@ -18,11 +18,8 @@ import { Checkbox, PrimerSelect } from "./ui/FormControls";
 import { Button } from "./ui/Button";
 import styles from "./DevemonCard.module.css";
 import sharedStyles from "./shared.module.css";
-import {
-  captureElementToPngBlob,
-  copyPngBlobToClipboard,
-  downloadBlob,
-} from "../utils/imageExport";
+import { copyPngBlobToClipboard } from "../utils/imageExport";
+import { downloadElementAsPng, elementToPngBlob } from "../utils/domExport";
 
 interface DevemonCardProps {
   user: GitHubUser;
@@ -197,12 +194,10 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!targetRef.current) return;
 
       try {
-        const blob = await captureElementToPngBlob(targetRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-        });
-        downloadBlob(blob, `devemon-${format}-${user.login}.png`);
+        await downloadElementAsPng(
+          targetRef.current,
+          `devemon-${format}-${user.login}.png`
+        );
       } catch (error) {
         console.error("Failed to download card:", error);
       }
@@ -228,11 +223,10 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!cardRef.current) return;
 
       try {
-        const blob = await captureElementToPngBlob(cardRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-        });
+        const blob = await elementToPngBlob(cardRef.current);
+        if (!blob) {
+          throw new Error("Failed to generate card image");
+        }
 
         try {
           await copyPngBlobToClipboard(blob);
@@ -362,6 +356,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
         <div className={styles.PreviewSection}>
           <div
             ref={cardRef}
+            data-devemon-card="true"
             className={styles.Card}
             style={{
               background: `linear-gradient(135deg, ${rarityInfo.color}15, ${rarityInfo.color}30)`,
@@ -423,7 +418,10 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                   {/* Available for Hire Badge */}
                   {availableForHire && (
                     <div className={styles.HireBadgeContainer}>
-                      <span className={styles.HireBadge}>
+                      <span
+                        data-open-to-work-badge="true"
+                        className={styles.HireBadge}
+                      >
                         <Icon
                           name="briefcase"
                           size={12}

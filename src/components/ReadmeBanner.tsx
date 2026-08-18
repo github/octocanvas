@@ -21,11 +21,11 @@ import { Icon } from "./ui/Icon";
 import { PrimaryButton, SecondaryButton } from "./ui/Button";
 import styles from "./ReadmeBanner.module.css";
 import sharedStyles from "./shared.module.css";
-import {
-  captureElementToPngBlob,
-  copyPngBlobToClipboard,
-  downloadBlob,
-} from "../utils/imageExport";
+import { copyPngBlobToClipboard } from "../utils/imageExport";
+import { downloadElementAsPng, elementToPngBlob } from "../utils/domExport";
+
+/** README banners are wide, so 2x keeps the exported file size reasonable. */
+const BANNER_EXPORT_SCALE = 2;
 
 export interface ReadmeBannerRef {
   downloadBanner: () => Promise<void>;
@@ -499,12 +499,11 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
       if (!standardBannerRef.current) return;
 
       try {
-        const blob = await captureElementToPngBlob(standardBannerRef.current, {
-          scale: 2,
-          backgroundColor: null,
-          useCORS: true,
-        });
-        downloadBlob(blob, `${user.login}-readme-banner.png`);
+        await downloadElementAsPng(
+          standardBannerRef.current,
+          `${user.login}-readme-banner.png`,
+          { scale: BANNER_EXPORT_SCALE }
+        );
       } catch (error) {
         console.error("Error generating banner:", error);
       }
@@ -550,11 +549,12 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
       if (!standardBannerRef.current) return;
 
       try {
-        const blob = await captureElementToPngBlob(standardBannerRef.current, {
-          scale: 2,
-          backgroundColor: null,
-          useCORS: true,
+        const blob = await elementToPngBlob(standardBannerRef.current, {
+          scale: BANNER_EXPORT_SCALE,
         });
+        if (!blob) {
+          throw new Error("Failed to generate banner image");
+        }
 
         try {
           await copyPngBlobToClipboard(blob);

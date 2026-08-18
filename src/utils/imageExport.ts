@@ -1,5 +1,3 @@
-import type { Options as Html2CanvasOptions } from "html2canvas";
-
 const nextFrame = () =>
   new Promise<void>((resolve) => {
     requestAnimationFrame(() => resolve());
@@ -104,30 +102,6 @@ export const svgToPngBlob = async (
 
     canvas.width = 0;
     canvas.height = 0;
-  }
-};
-
-export const captureElementToPngBlob = async (
-  element: HTMLElement,
-  options: Partial<Html2CanvasOptions>
-) => {
-  await yieldToBrowser();
-
-  const html2canvas = (await import("html2canvas")).default;
-  let canvas: HTMLCanvasElement | undefined;
-
-  try {
-    canvas = await html2canvas(element, {
-      logging: false,
-      ...options,
-    });
-
-    return await canvasToPngBlob(canvas);
-  } finally {
-    if (canvas) {
-      canvas.width = 0;
-      canvas.height = 0;
-    }
   }
 };
 
