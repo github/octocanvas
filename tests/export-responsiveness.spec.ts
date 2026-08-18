@@ -62,7 +62,12 @@ async function mockGitHubProfile(page: Page) {
 
 async function loadGeneratedProfile(page: Page) {
   await page.addInitScript(() => {
-    window.alert = () => undefined;
+    window.alert = (message) => {
+      (window as typeof window & { __octocanvasAlerts: string[] })
+        .__octocanvasAlerts ??= [];
+      (window as typeof window & { __octocanvasAlerts: string[] })
+        .__octocanvasAlerts.push(String(message));
+    };
     window.open = () => null;
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -101,6 +106,21 @@ async function loadGeneratedProfile(page: Page) {
   await expect(page.getByText("Your Wallpaper")).toBeVisible();
 }
 
+async function showDevemonCard(page: Page) {
+  await page.getByRole("tab", { name: "Devémon Card" }).click();
+  await expect(page.getByText("Your Devémon Card")).toBeVisible();
+}
+
+async function expectNoGenerationFailureAlert(page: Page) {
+  const alerts = await page.evaluate(
+    () =>
+      (window as typeof window & { __octocanvasAlerts?: string[] })
+        .__octocanvasAlerts ?? []
+  );
+
+  expect(alerts).not.toContain("Failed to generate card image. Please try again.");
+}
+
 test("wallpaper sharing keeps the rest of the page interactive", async ({
   page,
 }) => {
@@ -123,4 +143,28 @@ test("wallpaper downloads keep the rest of the page interactive", async ({
   await devemonTab.click();
 
   await expect(devemonTab).toHaveAttribute("aria-selected", "true");
+});
+
+test("devemon card sharing generates an image without the failure alert", async ({
+  page,
+}) => {
+  await loadGeneratedProfile(page);
+  await showDevemonCard(page);
+
+  await page.getByRole("button", { name: "Twitter/X" }).click();
+
+  await expectNoGenerationFailureAlert(page);
+});
+
+test("devemon card sharing keeps the rest of the page interactive", async ({
+  page,
+}) => {
+  await loadGeneratedProfile(page);
+  await showDevemonCard(page);
+
+  await page.getByRole("button", { name: "Twitter/X" }).click();
+  const bannerTab = page.getByRole("tab", { name: "README Banner" });
+  await bannerTab.click();
+
+  await expect(bannerTab).toHaveAttribute("aria-selected", "true");
 });
