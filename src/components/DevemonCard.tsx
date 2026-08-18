@@ -18,6 +18,7 @@ import { Checkbox, PrimerSelect } from "./ui/FormControls";
 import { Button } from "./ui/Button";
 import styles from "./DevemonCard.module.css";
 import sharedStyles from "./shared.module.css";
+import { downloadElementAsPng, elementToPngBlob } from "../utils/domExport";
 
 interface DevemonCardProps {
   user: GitHubUser;
@@ -192,24 +193,10 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!targetRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(targetRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
-
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `devemon-${format}-${user.login}.png`;
-            link.click();
-            URL.revokeObjectURL(url);
-          }
-        }, "image/png");
+        await downloadElementAsPng(
+          targetRef.current,
+          `devemon-${format}-${user.login}.png`
+        );
       } catch (error) {
         console.error("Failed to download card:", error);
       }
@@ -222,43 +209,35 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!cardRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(cardRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
+        const blob = await elementToPngBlob(cardRef.current);
 
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
+        if (blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": blob }),
+            ]);
 
-              alert(
-                "✅ Devémon card copied to clipboard! You can now paste it in your tweet."
-              );
+            alert(
+              "✅ Devémon card copied to clipboard! You can now paste it in your tweet."
+            );
 
-              const tweetText =
-                "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
-              const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                tweetText
-              )}`;
-              window.open(
-                twitterUrl,
-                "twitter-share-dialog",
-                "width=626,height=436"
-              );
-            } catch (error) {
-              console.error("Error copying to clipboard:", error);
-              alert(
-                "Failed to copy card to clipboard. Please download it manually."
-              );
-            }
+            const tweetText =
+              "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+              tweetText
+            )}`;
+            window.open(
+              twitterUrl,
+              "twitter-share-dialog",
+              "width=626,height=436"
+            );
+          } catch (error) {
+            console.error("Error copying to clipboard:", error);
+            alert(
+              "Failed to copy card to clipboard. Please download it manually."
+            );
           }
-        }, "image/png");
+        }
       } catch (error) {
         console.error("Error sharing to Twitter:", error);
         alert("Failed to generate card image. Please try again.");
@@ -272,43 +251,35 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!cardRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(cardRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
+        const blob = await elementToPngBlob(cardRef.current);
 
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
+        if (blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": blob }),
+            ]);
 
-              alert(
-                "✅ Devémon card copied to clipboard! You can now paste it in your Bluesky post."
-              );
+            alert(
+              "✅ Devémon card copied to clipboard! You can now paste it in your Bluesky post."
+            );
 
-              const postText =
-                "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
-              const blueskyUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(
-                postText
-              )}`;
-              window.open(
-                blueskyUrl,
-                "bluesky-share-dialog",
-                "width=626,height=600"
-              );
-            } catch (error) {
-              console.error("Error copying to clipboard:", error);
-              alert(
-                "Failed to copy card to clipboard. Please download it manually."
-              );
-            }
+            const postText =
+              "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
+            const blueskyUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(
+              postText
+            )}`;
+            window.open(
+              blueskyUrl,
+              "bluesky-share-dialog",
+              "width=626,height=600"
+            );
+          } catch (error) {
+            console.error("Error copying to clipboard:", error);
+            alert(
+              "Failed to copy card to clipboard. Please download it manually."
+            );
           }
-        }, "image/png");
+        }
       } catch (error) {
         console.error("Error sharing to Bluesky:", error);
         alert("Failed to generate card image. Please try again.");
@@ -322,43 +293,35 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!cardRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(cardRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
+        const blob = await elementToPngBlob(cardRef.current);
 
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
+        if (blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": blob }),
+            ]);
 
-              alert(
-                "✅ Devémon card copied to clipboard! You can now paste it in your Threads post."
-              );
+            alert(
+              "✅ Devémon card copied to clipboard! You can now paste it in your Threads post."
+            );
 
-              const postText =
-                "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
-              const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(
-                postText
-              )}`;
-              window.open(
-                threadsUrl,
-                "threads-share-dialog",
-                "width=626,height=600"
-              );
-            } catch (error) {
-              console.error("Error copying to clipboard:", error);
-              alert(
-                "Failed to copy card to clipboard. Please download it manually."
-              );
-            }
+            const postText =
+              "Just created my custom GitHub Universe Devémon card using Octocanvas from #GitHubUniverse 🎴";
+            const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(
+              postText
+            )}`;
+            window.open(
+              threadsUrl,
+              "threads-share-dialog",
+              "width=626,height=600"
+            );
+          } catch (error) {
+            console.error("Error copying to clipboard:", error);
+            alert(
+              "Failed to copy card to clipboard. Please download it manually."
+            );
           }
-        }, "image/png");
+        }
       } catch (error) {
         console.error("Error sharing to Threads:", error);
         alert("Failed to generate card image. Please try again.");
@@ -372,41 +335,33 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
       if (!cardRef.current) return;
 
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(cardRef.current, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false,
-        });
+        const blob = await elementToPngBlob(cardRef.current);
 
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
+        if (blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": blob }),
+            ]);
 
-              alert(
-                "✅ Devémon card copied to clipboard!\n\n📱 To share on Instagram:\n1. Open the Instagram app on your device\n2. Tap the + button to create a new post\n3. Paste the image from your clipboard\n4. Add your caption and share!"
+            alert(
+              "✅ Devémon card copied to clipboard!\n\n📱 To share on Instagram:\n1. Open the Instagram app on your device\n2. Tap the + button to create a new post\n3. Paste the image from your clipboard\n4. Add your caption and share!"
+            );
+
+            window.location.href = "instagram://library";
+            setTimeout(() => {
+              window.open(
+                "https://www.instagram.com/",
+                "instagram-share",
+                "width=626,height=600"
               );
-
-              window.location.href = "instagram://library";
-              setTimeout(() => {
-                window.open(
-                  "https://www.instagram.com/",
-                  "instagram-share",
-                  "width=626,height=600"
-                );
-              }, 1500);
-            } catch (error) {
-              console.error("Error copying to clipboard:", error);
-              alert(
-                "Failed to copy card to clipboard. Please download it manually."
-              );
-            }
+            }, 1500);
+          } catch (error) {
+            console.error("Error copying to clipboard:", error);
+            alert(
+              "Failed to copy card to clipboard. Please download it manually."
+            );
           }
-        }, "image/png");
+        }
       } catch (error) {
         console.error("Error sharing to Instagram:", error);
         alert("Failed to generate card image. Please try again.");
@@ -432,6 +387,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
         <div className={styles.PreviewSection}>
           <div
             ref={cardRef}
+            data-devemon-card="true"
             className={styles.Card}
             style={{
               background: `linear-gradient(135deg, ${rarityInfo.color}15, ${rarityInfo.color}30)`,
@@ -493,7 +449,10 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                   {/* Available for Hire Badge */}
                   {availableForHire && (
                     <div className={styles.HireBadgeContainer}>
-                      <span className={styles.HireBadge}>
+                      <span
+                        data-open-to-work-badge="true"
+                        className={styles.HireBadge}
+                      >
                         <Icon
                           name="briefcase"
                           size={12}

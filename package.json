@@ -15,7 +15,7 @@
     "@primer/react-brand": "^0.73.0",
     "astro": "^7.2.2",
     "framer-motion": "^13.1.0",
-    "html2canvas": "^1.4.1",
+    "modern-screenshot": "^4.7.0",
     "preact": "^10.29.8",
     "react": "^19.2.8",
     "react-social-icons": "^6.26.0",
