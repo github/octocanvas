@@ -107,6 +107,12 @@
   transition: all 200ms;
 }
 
+.RarityBadgeText {
+  display: block;
+  line-height: 1;
+  transform: translateY(-3px);
+}
+
 /* Avatar Section */
 .AvatarSection {
   display: flex;
@@ -201,7 +207,7 @@
 .HireBadgeText {
   display: block;
   line-height: 1;
-  transform: translateY(-1px);
+  transform: translateY(-4px);
 }
 
 /* Stats Section */
@@ -235,6 +241,12 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+}
+
+.StatLabelText {
+  display: block;
+  line-height: 1;
+  transform: translateY(-3px);
 }
 
 .StatValue {

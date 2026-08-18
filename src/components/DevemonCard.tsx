@@ -465,7 +465,9 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                       color: rarityInfo.color,
                     }}
                   >
-                    {rarityInfo.name.toUpperCase()}
+                    <span className={styles.RarityBadgeText}>
+                      {rarityInfo.name.toUpperCase()}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -523,7 +525,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Repositories"
                       />
-                      Repositories
+                      <span className={styles.StatLabelText}>Repositories</span>
                     </div>
                     <div className={styles.StatValue}>{user.public_repos}</div>
                   </div>
@@ -535,7 +537,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Followers"
                       />
-                      Followers
+                      <span className={styles.StatLabelText}>Followers</span>
                     </div>
                     <div className={styles.StatValue}>{user.followers}</div>
                   </div>
@@ -547,7 +549,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Stars"
                       />
-                      Stars
+                      <span className={styles.StatLabelText}>Stars</span>
                     </div>
                     <div className={styles.StatValue}>
                       {extendedStats.totalStars}
@@ -561,7 +563,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Forks"
                       />
-                      Forks
+                      <span className={styles.StatLabelText}>Forks</span>
                     </div>
                     <div className={styles.StatValue}>
                       {extendedStats.totalForks}
@@ -578,7 +580,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                       color="currentColor"
                       label="Contributions"
                     />
-                    Contributions
+                    <span className={styles.StatLabelText}>Contributions</span>
                   </div>
                   <div className={styles.StatValue}>
                     {user.contributions?.totalContributions || 0}
@@ -595,7 +597,9 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
                         color="currentColor"
                         label="Languages"
                       />
+                      <span className={styles.StatLabelText}>
                       Languages Mastered
+                      </span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {extendedStats.topLanguages.map((lang) => (

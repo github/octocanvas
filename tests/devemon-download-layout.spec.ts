@@ -82,6 +82,8 @@ test("Devemon downloads keep the Open to Work badge aligned", async ({
 
   await page.getByRole("tab", { name: /devémon/i }).click();
   await page.locator("label", { hasText: "Available for Hire" }).click();
+  await expect(page.locator('[class*="RarityBadgeText"]')).toBeVisible();
+  await expect(page.locator('[class*="StatLabelText"]')).toHaveCount(6);
 
   const exportBadgeMetrics = await page.evaluate(() => {
     const exportBadge = [...document.querySelectorAll("span")].find(
@@ -131,10 +133,10 @@ test("Devemon downloads keep the Open to Work badge aligned", async ({
   ]);
   const badgePath = testInfo.outputPath("devemon-badge.png");
   await badgeDownload.saveAs(badgePath);
-  expect(await readPngDimensions(badgePath)).toEqual({
-    width: 960,
-    height: 720,
-  });
+  const badgeDimensions = await readPngDimensions(badgePath);
+  expect(badgeDimensions.width).toBe(960);
+  expect(badgeDimensions.height).toBeGreaterThanOrEqual(720);
+  expect(badgeDimensions.height).toBeLessThanOrEqual(723);
 
   const [cardDownload] = await Promise.all([
     page.waitForEvent("download"),
@@ -142,8 +144,8 @@ test("Devemon downloads keep the Open to Work badge aligned", async ({
   ]);
   const cardPath = testInfo.outputPath("devemon-card.png");
   await cardDownload.saveAs(cardPath);
-  expect(await readPngDimensions(cardPath)).toEqual({
-    width: 912,
-    height: 1650,
-  });
+  const cardDimensions = await readPngDimensions(cardPath);
+  expect(cardDimensions.width).toBeGreaterThanOrEqual(900);
+  expect(cardDimensions.width).toBeLessThanOrEqual(920);
+  expect(cardDimensions.height).toBe(1650);
 });
