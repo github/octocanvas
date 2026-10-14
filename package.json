@@ -14,7 +14,7 @@
     "@astrojs/preact": "^6.0.5",
     "@primer/react-brand": "^0.77.0",
     "astro": "^7.3.5",
-    "framer-motion": "^13.1.1",
+    "framer-motion": "^14.1.0",
     "modern-screenshot": "^4.7.0",
     "preact": "^10.29.8",
     "react": "^19.3.0",
