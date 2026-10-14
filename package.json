@@ -11,9 +11,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^6.0.5",
-    "@primer/react-brand": "^0.77.0",
-    "astro": "^7.3.5",
+    "@astrojs/preact": "^6.0.6",
+    "@primer/react-brand": "^0.78.0",
+    "astro": "^7.3.8",
     "framer-motion": "^13.1.1",
     "modern-screenshot": "^4.7.0",
     "preact": "^10.29.8",
@@ -23,11 +23,11 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/vite": "^4.3.3",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "@typescript/native": "npm:typescript@^7.0.2",
-    "baseline-browser-mapping": "^2.11.27",
+    "baseline-browser-mapping": "^2.11.28",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "overrides": {
