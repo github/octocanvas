@@ -11,12 +11,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^6.0.5",
+    "@astrojs/preact": "^6.1.0",
     "@primer/react-brand": "^0.77.0",
     "astro": "^7.3.5",
     "framer-motion": "^13.1.1",
     "modern-screenshot": "^4.7.0",
-    "preact": "^10.29.8",
+    "preact": "^11.0.1",
     "react": "^19.3.0",
     "react-social-icons": "^6.27.0",
     "tailwindcss": "^4.3.3"

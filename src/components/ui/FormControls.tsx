@@ -69,6 +69,12 @@ export function Checkbox({
   );
 }
 
+type TextInputType = "text" | "email" | "password" | "url";
+
+// Preact 11 types <input> attributes per `type`, so a union-typed `type`
+// must be split into one object per member before it is spread onto <input>.
+type TextInputTypeAttr = { [K in TextInputType]: { type: K } }[TextInputType];
+
 interface TextInputProps {
   /** Input label */
   label?: string;
@@ -86,7 +92,7 @@ interface TextInputProps {
   placeholder?: string;
 
   /** Input type */
-  type?: "text" | "email" | "password" | "url";
+  type?: TextInputType;
 
   /** Disabled state */
   disabled?: boolean;
@@ -135,6 +141,7 @@ export function TextInput({
   ]
     .filter(Boolean)
     .join(" ");
+  const typeAttr: TextInputTypeAttr = { type };
 
   return (
     <div className={styles.formControlWrap}>
@@ -150,7 +157,7 @@ export function TextInput({
       <div className={wrapperClasses}>
         <input
           id={id}
-          type={type}
+          {...typeAttr}
           value={value}
           onChange={
             onChange
