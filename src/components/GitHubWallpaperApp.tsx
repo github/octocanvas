@@ -18,6 +18,7 @@
 import { useState, useRef } from "preact/hooks";
 import { flushSync } from "preact/compat";
 import type { JSX } from "preact";
+import { isValidGitHubUsername } from "../utils/sanitize";
 import WallpaperGenerator, {
   type WallpaperGeneratorRef,
 } from "./WallpaperGenerator";
@@ -267,6 +268,13 @@ export default function GitHubWallpaperApp() {
       return;
     }
 
+    if (!isValidGitHubUsername(cleanUsername)) {
+      setError(
+        "That doesn't look like a GitHub username. Use letters, numbers, and single hyphens (max 39 characters)."
+      );
+      return;
+    }
+
     setLoading(true);
     setError("");
     setUserData(null);
@@ -274,7 +282,7 @@ export default function GitHubWallpaperApp() {
 
     try {
       const response = await fetch(
-        `https://api.github.com/users/${cleanUsername}`
+        `https://api.github.com/users/${encodeURIComponent(cleanUsername)}`
       );
 
       if (!response.ok) {

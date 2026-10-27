@@ -19,6 +19,7 @@ import {
   svgToPngBlob,
   yieldToBrowser,
 } from "../utils/imageExport";
+import { escapeXml, formatCount, safeImageHref } from "../utils/sanitize";
 
 interface WallpaperGeneratorProps {
   user: GitHubUser;
@@ -572,7 +573,7 @@ const WallpaperGenerator = forwardRef<
           <!-- Avatar in card -->
           <image 
             ${isStatic ? "" : 'class="avatar-universe"'}
-            href="${currentAvatarBase64 || user.avatar_url}" 
+            href="${safeImageHref(currentAvatarBase64 || user.avatar_url)}" 
             x="${centerX - cardAvatarSize / 2}" 
             y="${cardAvatarY - cardAvatarSize / 2}" 
             width="${cardAvatarSize}" 
@@ -605,7 +606,7 @@ const WallpaperGenerator = forwardRef<
             fill="#000000"
             text-anchor="middle"
             letter-spacing="2"
-          >${(user.name || user.login).toUpperCase()}</text>
+          >${escapeXml((user.name || user.login).toUpperCase())}</text>
 
           <!-- Username -->
           <text 
@@ -618,7 +619,7 @@ const WallpaperGenerator = forwardRef<
             font-weight="400"
             fill="#000000"
             text-anchor="middle"
-          >@${user.login}</text>
+          >@${escapeXml(user.login)}</text>
 
           <!-- Stats - three columns -->
           <text 
@@ -632,7 +633,7 @@ const WallpaperGenerator = forwardRef<
             fill="#000000"
             text-anchor="middle"
             letter-spacing="1"
-          >${contributions?.totalContributions.toLocaleString() || 0}</text>
+          >${formatCount(contributions?.totalContributions)}</text>
           <text 
             ${isStatic ? "" : 'class="stats-universe"'}
             x="${centerX - cardWidth * 0.28}" 
@@ -655,7 +656,7 @@ const WallpaperGenerator = forwardRef<
             fill="#000000" 
             text-anchor="middle"
             letter-spacing="1"
-          >${user.public_repos.toLocaleString()}</text>
+          >${formatCount(user.public_repos)}</text>
           <text 
             ${isStatic ? "" : 'class="stats-universe"'}
             x="${centerX}" 
@@ -678,7 +679,7 @@ const WallpaperGenerator = forwardRef<
             fill="#000000" 
             text-anchor="middle"
             letter-spacing="1"
-          >${user.followers.toLocaleString()}</text>
+          >${formatCount(user.followers)}</text>
           <text 
             ${isStatic ? "" : 'class="stats-universe"'}
             x="${centerX + cardWidth * 0.28}" 
@@ -767,7 +768,7 @@ const WallpaperGenerator = forwardRef<
 
         <!-- Avatar image with better centering and filter -->
         <image
-          href="${currentAvatarBase64 || user.avatar_url}"
+          href="${safeImageHref(currentAvatarBase64 || user.avatar_url)}"
           x="${centerX - avatarSize / 2}"
           y="${centerY - avatarSize * 1.5}"
           width="${avatarSize}"
@@ -798,7 +799,7 @@ const WallpaperGenerator = forwardRef<
           fill="${textColor}" 
           text-anchor="middle"
           letter-spacing="2"
-        >${user.name || user.login}</text>
+        >${escapeXml(user.name || user.login)}</text>
 
         <!-- GitHub handle centered with monospace -->
         <text 
@@ -811,7 +812,7 @@ const WallpaperGenerator = forwardRef<
           opacity="0.95" 
           text-anchor="middle"
           letter-spacing="1"
-        >@${user.login}</text>
+        >@${escapeXml(user.login)}</text>
 
         <!-- Stats centered with GitHub Universe styling -->
         <text 
@@ -825,9 +826,9 @@ const WallpaperGenerator = forwardRef<
           opacity="0.9" 
           text-anchor="middle"
           letter-spacing="1.5"
-        >${user.followers.toLocaleString()} FOLLOWERS · ${user.public_repos.toLocaleString()} REPOS${contributions
+        >${formatCount(user.followers)} FOLLOWERS · ${formatCount(user.public_repos)} REPOS${contributions
         ? " · " +
-        contributions.totalContributions.toLocaleString() +
+        formatCount(contributions.totalContributions) +
         " CONTRIBUTIONS"
         : ""
       }</text>
@@ -845,7 +846,7 @@ const WallpaperGenerator = forwardRef<
           opacity="1" 
           letter-spacing="2"
           text-anchor="middle"
-        >${contributions?.totalContributions.toLocaleString() || 0
+        >${formatCount(contributions?.totalContributions)
         } CONTRIBUTIONS IN ${contributionYearText}</text>
         `
         : ""
