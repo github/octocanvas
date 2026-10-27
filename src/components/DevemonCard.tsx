@@ -130,7 +130,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
         try {
           // Fetch user's repositories
           const reposResponse = await fetch(
-            `https://api.github.com/users/${user.login}/repos?per_page=100&sort=updated`
+            `https://api.github.com/users/${encodeURIComponent(user.login)}/repos?per_page=100&sort=updated`
           );
           if (!reposResponse.ok) {
             console.error("Failed to fetch repos");

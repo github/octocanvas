@@ -430,7 +430,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
       const fetchExtendedStats = async () => {
         try {
           const reposResponse = await fetch(
-            `https://api.github.com/users/${user.login}/repos?per_page=100&sort=updated`
+            `https://api.github.com/users/${encodeURIComponent(user.login)}/repos?per_page=100&sort=updated`
           );
 
           if (!reposResponse.ok) {
