@@ -11,23 +11,23 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^6.1.0",
-    "@primer/react-brand": "^0.79.0",
-    "astro": "^7.4.0",
-    "framer-motion": "^14.3.0",
+    "@astrojs/preact": "^6.1.1",
+    "@primer/react-brand": "^0.80.1",
+    "astro": "^7.4.2",
+    "framer-motion": "^14.6.0",
     "modern-screenshot": "^4.7.0",
-    "preact": "^11.0.1",
+    "preact": "^11.0.2",
     "react": "^19.3.1",
     "react-social-icons": "^6.27.0",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
+    "@astrojs/check": "^0.9.12",
     "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.5",
     "@typescript/native": "npm:typescript@^7.0.2",
-    "baseline-browser-mapping": "^2.11.29",
+    "baseline-browser-mapping": "^2.11.32",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "overrides": {
