@@ -1,7 +1,6 @@
 # OctoCanvas - Custom Instructions
 
 ## Project Overview
-OctoCanvas is a GitHub-themed application that creates two types of collectibles based on GitHub user profiles:
 1. **Wallpaper Generator**: Personalized wallpapers with contribution graphs
 2. **Devémon Card**: Trading card-style collectibles with GitHub stats and rarity system
 
@@ -33,20 +32,6 @@ Built with Astro, Preact, TypeScript, and Tailwind CSS.
 - **Red**: `#ff7b72` (danger, dragon type)
 - **Gray**: `#7d8590` (neutral, muted text)
 
-### Color Palette (Tailwind Config)
-```
-universe-green: #5fed83
-universe-green-light: #bfffd1
-universe-green-hover: #4dd46e
-universe-green-dark: #08872B
-universe-green-border: #a8e6c5
-universe-black: #0a0e0d
-universe-dark-bg: #101411
-universe-dark-surface: #1c201e
-universe-dark-border: #2d3330
-universe-gray-muted: #8b918f
-```
-
 ## Core Features
 
 ### Feature 1: Wallpaper Generator
@@ -59,10 +44,8 @@ universe-gray-muted: #8b918f
   - Follower count
   - Repository count
   - **Total contributions** (accurate count from last 12 months)
-  - Bio (if available)
 
 #### Contribution Graph
-- **Data Source**: Fetches contribution data via API (`https://contributions-api.me-5bd.workers.dev/?username=${encodeURIComponent(username)}`)
 - **Visualization**: 
   - 53-week calendar (last year)
   - Color intensity based on contribution count:
@@ -90,12 +73,6 @@ universe-gray-muted: #8b918f
   - GitHub Universe branding
 
 #### Animated Preview
-- **AnimatedBackground Component**: 
-  - 50 particles with random positions and velocities
-  - Radial gradient circles (Universe Green)
-  - Gentle floating animation
-  - 0.4 opacity for subtle effect
-  - Visible in black areas around wallpaper preview
 - **SVG Animations** (preview only, not in downloads):
   - Pulsing glow on avatar border (3s cycle)
   - Floating decorative circles (6s cycle, staggered delays)
@@ -113,32 +90,15 @@ universe-gray-muted: #8b918f
   - Holographic border effect
   - Avatar at top center (96×96px)
   - Stats displayed below avatar
-  - Power calculation shown
   - Rarity badge
-  - Type indicator with icon
   - "Available for Hire" badge (optional)
   
 - **Badge Format**: 320×240px (landscape, 4:3 aspect ratio)
   - Compact horizontal layout
   - Avatar left side (80×80px)
   - Stats in center column
-  - Contribution graph visualization
   - Rarity indicator
   - "Available for Hire" badge (optional, bottom placement)
-
-#### Rarity System
-Power is calculated based on GitHub stats:
-```
-power = (followers × 10) + (repos × 5) + (totalContributions × 0.1)
-```
-
-Rarity levels based on power thresholds:
-1. **Common** (0-99): Gray (`#7d8590`) - "Normal" type, ⭐
-2. **Uncommon** (100-499): Green (`#7ee787`) - "Grass" type, ⭐⭐
-3. **Rare** (500-999): Blue (`#58a6ff`) - "Water" type, ⭐⭐⭐
-4. **Epic** (1000-4999): Purple (`#bc8cff`) - "Psychic" type, 🌟
-5. **Legendary** (5000-9999): Orange (`#ffa657`) - "Fire" type, 🌟🌟
-6. **Mythical** (10000+): Red (`#ff7b72`) - "Dragon" type, 🌟🌟🌟
 
 #### Available for Hire Badge
 - **Toggle**: Checkbox control to enable/disable badge
@@ -150,20 +110,14 @@ Rarity levels based on power thresholds:
   - Dark text for contrast
   - Small font size (9px for badge format)
   - Rounded corners with padding
-  - Inline CSS for html2canvas compatibility
+  - Inline CSS
 
 #### Data Sources
 - **GitHub REST API**: User profile, follower count, public repos
-- **Contributions API**: `https://contributions-api.me-5bd.workers.dev/?username=${username}`
-  - Returns structured JSON with total contributions
-  - More reliable than HTML scraping
-  - Provides last 12 months of data
 
 #### Export Technology
-- **html2canvas**: Captures card/badge as PNG
-  - Scale: 3 (for high resolution)
-  - backgroundColor: null (transparent)
-  - useCORS: true (for avatar images)
+- Scale: 3 (for high resolution)
+- backgroundColor: null (transparent)
 - **Important**: Elements must be inside the ref container to be captured
 - **Styling**: Inline CSS styles work better than Tailwind classes
 
@@ -208,9 +162,7 @@ Rarity levels based on power thresholds:
 ```
 src/
 ├── components/
-│   ├── AnimatedBackground.tsx - Canvas particle animation
 │   ├── DevemonCard.tsx - Trading card component with rarity system
-│   ├── GitHubPreviewCard.tsx - Profile preview with stats
 │   ├── GitHubWallpaperApp.tsx - Main app logic and data fetching
 │   └── WallpaperGenerator.tsx - SVG generation and export
 └── pages/
@@ -226,40 +178,21 @@ src/
 - Uses base64 avatar to avoid CORS issues
 - Properly centers all elements
 
-#### WallpaperGenerator: `fetchContributionData(username)`
+#### GitHubWallpaperApp: `fetchContributionData(username)`
 - Fetches from contributions API
 - Returns structured JSON with:
   - Total contributions count
   - Daily contribution data
   - Week-by-week breakdown
-- Builds 53-week calendar with accurate counts
 
 #### WallpaperGenerator: `downloadWallpaper(sizeKey)`
 - Generates static SVG (no animations)
 - Converts to PNG via Canvas API
 - Triggers browser download
 
-#### DevemonCard: `calculatePower(userData, contributionData)`
-- Formula: `(followers × 10) + (repos × 5) + (totalContributions × 0.1)`
-- Returns power value and rarity object
-- Rarity object contains: level, color, type, stars
-
-#### DevemonCard: `getRarity(power)`
-- Maps power value to rarity tier
-- Returns: { level, color, type, stars }
-- 6 tiers from Common (0-99) to Mythical (10000+)
-
-#### DevemonCard: `downloadCard()` / `downloadBadge()`
-- Uses html2canvas to capture card/badge
+#### DevemonCard: `downloadCard(format)`
 - Scale: 3 for high resolution
 - Downloads as PNG with username in filename
-- Must capture elements inside ref container
-
-#### DevemonCard: Contribution Graph Rendering
-- Displays last 52 weeks of contributions
-- Color intensity based on contribution count
-- Uses GitHub Primer green (#7ee787) with varying opacity
-- Week labels and month labels for context
 
 
 ## Deployment
@@ -267,14 +200,6 @@ src/
 ### GitHub Actions Workflow
 - **Main Branch**: Auto-deploys to GitHub Pages (production)
 - **Prototype Branch**: Builds but doesn't auto-deploy (safe testing)
-- **Manual Deploy**: Can deploy any branch via workflow_dispatch
-- **Base Path**: `/octocanvas`
-
-### Configuration
-```javascript
-// astro.config.mjs
-base: '/octocanvas'
-```
 
 ## User Experience Flow
 
@@ -289,9 +214,8 @@ base: '/octocanvas'
 2. View profile data loading
 3. System calculates power and assigns rarity
 4. Preview card format (350×550px portrait)
-5. Preview badge format (320×240px landscape)
-6. Toggle "Available for Hire" badge (optional)
-7. Download card or badge as PNG
+5. Toggle "Available for Hire" badge (optional)
+6. Download card or badge as PNG
 
 ## Best Practices
 - ✅ All GitHub Universe styling applied consistently to wallpapers
@@ -306,7 +230,7 @@ base: '/octocanvas'
 - ✅ CORS-safe asset handling
 - ✅ Static wallpapers (no animations in exports)
 - ✅ High-resolution exports (3× scale for cards/badges)
-- ✅ Inline CSS for html2canvas compatibility
+- ✅ Inline CSS
 
 ## Future Enhancements (Ideas)
 - [ ] Theme customization (color palettes)
@@ -328,7 +252,6 @@ base: '/octocanvas'
 - **Preact**: Lightweight React alternative for UI components
 - **TypeScript**: Type safety and better developer experience
 - **Tailwind CSS**: Utility-first CSS framework
-- **html2canvas**: Client-side screenshot library for card exports
 - **Monaspace Neon**: Monospace font for retro-tech aesthetic
 
 ## APIs
@@ -337,10 +260,6 @@ base: '/octocanvas'
   - Follower count
   - Public repository count
   
-- **Contributions API**: `https://contributions-api.me-5bd.workers.dev/?username={username}`
-  - Total contributions (last 12 months)
-  - Daily contribution data
-  - Structured JSON response
 
 ## Project Links
 - Repository: github.com/jldeen/octocanvas
@@ -364,14 +283,7 @@ npm run build
 ### Deployment
 - **Main Branch**: Auto-deploys to GitHub Pages (production)
 - **Prototype Branch**: Builds but doesn't auto-deploy (safe testing)
-- **Manual Deploy**: Can deploy any branch via workflow_dispatch
-- **Base Path**: `/octocanvas`
 
-### Configuration
-```javascript
-// astro.config.mjs
-base: '/octocanvas'
-```
 ### Share to X (Twitter)
 # X/Twitter Share Implementation - **IMPLEMENTED** ✅
 
@@ -381,13 +293,13 @@ base: '/octocanvas'
 
 ### Location
 - **Component**: `src/components/WallpaperGenerator.tsx`
-- **Function**: `copyToClipboard(sizeKey: SizeKey = 'desktop')`
+- **Function**: `createWallpaperPngBlob(sizeKey: SizeKey = 'desktop')`
 - **Function**: `handleTwitterShare()`
 - **No state needed**: Uses async/await pattern
 
 ### How It Works
 
-1. **`copyToClipboard()` - Generate PNG Blob**:
+1. **`createWallpaperPngBlob()` - Generate PNG Blob**:
    - Takes optional `sizeKey` parameter (defaults to 'desktop' for sharing)
    - Reuses existing `generateSVG()` function with `isStatic=true`
    - Creates off-screen canvas via Canvas API
@@ -415,35 +327,6 @@ base: '/octocanvas'
    - Safari support limited (requires user permission)
 
 3. **`handleTwitterShare()` - Open Twitter Intent**:
-   ```typescript
-   const handleTwitterShare = async () => {
-     try {
-       // Copy wallpaper to clipboard first
-       await copyToClipboard('desktop');
-       
-       // Show success message
-       alert('✅ Wallpaper copied to clipboard! You can now paste it in your tweet.');
-       
-       // Open Twitter with pre-filled text
-       const tweetText = "Just created my GitHub Universe wallpaper with VS Code and GitHub Copilot live on stage at #GitHubUniverse 🎨";
-       const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-       
-       window.open(
-         twitterUrl,
-         'twitter-share-dialog',
-         'width=626,height=436,toolbar=0,menubar=0,location=0,status=0'
-       );
-     } catch (error) {
-       console.error('Error sharing to Twitter:', error);
-       alert('Failed to copy wallpaper to clipboard. Please download it manually and attach to your tweet.');
-       
-       // Still open Twitter even if clipboard fails
-       const tweetText = "Just created my GitHub Universe wallpaper with VS Code and GitHub Copilot live on stage at #GitHubUniverse 🎨";
-       const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-       window.open(twitterUrl, 'twitter-share-dialog', 'width=626,height=436');
-     }
-   };
-   ```
    - Copies desktop wallpaper (2560×1440) to clipboard
    - Shows success alert with green checkmark emoji
    - Opens Twitter in popup window with specific dimensions
@@ -482,38 +365,10 @@ base: '/octocanvas'
 </div>
 ```
 
-### Icon Addition
-**File**: `src/components/ui/Icon.tsx`
-
-Added Twitter/X icon case (responds to both 'twitter' and 'x'):
-```typescript
-case 'twitter':
-case 'x':
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 16 16"
-      fill={color}
-      className={iconClasses}
-      style={{ width: iconSize, height: iconSize }}
-      aria-label={label}
-      role={label ? 'img' : undefined}
-    >
-      <path d="M9.52217 6.77491L14.4804 1H13.3119L8.9876 5.88256L5.54454 1H1.15039L6.35671 8.89547L1.15039 15H2.31893L6.89027 9.78779L10.5362 15H14.9303L9.52183 6.77491H9.52217ZM7.49624 9.08808L6.99511 8.39123L2.72345 1.81986H4.97844L8.40632 7.19919L8.90746 7.89604L13.3124 14.2121H11.0575L7.49624 9.08842V9.08808Z" />
-    </svg>
-  );
-```
-- 16px viewBox to match other functional icons
-- Uses new X logo design (not old Twitter bird)
-- Inline SVG in button (not using Icon component to avoid dependency)
-
 ### Tweet Text
-**Exact**: `"Just created my GitHub Universe wallpaper with VS Code and GitHub Copilot live on stage at #GitHubUniverse 🎨"`
 
 **Includes**:
 - `#GitHubUniverse` hashtag
-- VS Code mention
-- GitHub Copilot mention
 - Artist palette emoji 🎨
 
 ### Browser Compatibility
