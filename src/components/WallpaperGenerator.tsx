@@ -943,7 +943,7 @@ const WallpaperGenerator = forwardRef<
       alert(failureMessage);
     } finally {
       if (shareUrl) {
-        window.open(shareUrl, windowName, windowFeatures);
+        window.open(shareUrl, windowName, `${windowFeatures},noopener,noreferrer`);
       }
       afterShare?.();
     }
@@ -1039,7 +1039,7 @@ const WallpaperGenerator = forwardRef<
         window.open(
           "https://www.instagram.com/",
           "instagram-share",
-          "width=626,height=600"
+          "width=626,height=600,noopener,noreferrer"
         );
       }, 1500);
     };
