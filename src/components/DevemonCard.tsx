@@ -233,7 +233,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
           alert(successMessage);
 
           if (shareUrl) {
-            window.open(shareUrl, windowName, windowFeatures);
+            window.open(shareUrl, windowName, `${windowFeatures},noopener,noreferrer`);
           }
           afterShare?.();
         } catch (error) {
@@ -330,7 +330,7 @@ const DevemonCard = forwardRef<DevemonCardRef, DevemonCardProps>(
             window.open(
               "https://www.instagram.com/",
               "instagram-share",
-              "width=626,height=600"
+              "width=626,height=600,noopener,noreferrer"
             );
           }, 1500);
         },
