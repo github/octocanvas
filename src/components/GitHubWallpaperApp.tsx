@@ -15,7 +15,7 @@
 
 // @ts-nocheck
 
-import { useState, useRef } from "preact/hooks";
+import { useState, useRef, useEffect } from "preact/hooks";
 import { flushSync } from "preact/compat";
 import type { JSX } from "preact";
 import { isValidGitHubUsername } from "../utils/sanitize";
@@ -75,6 +75,7 @@ const AVATAR_FILTERS = {
 
 // Tab stuff mostly copied from https://github.com/github/githubuniverse.com/blob/main/components/Tickets/Tickets.tsx
 export default function GitHubWallpaperApp() {
+  const [isHydrated, setIsHydrated] = useState(false);
   const [username, setUsername] = useState("");
   const [userData, setUserData] = useState<GitHubUser | null>(null);
   const [loading, setLoading] = useState(false);
@@ -82,6 +83,10 @@ export default function GitHubWallpaperApp() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [busyAction, setBusyAction] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Wallpaper form controls
   const [wallpaperTheme, setWallpaperTheme] = useState<
@@ -355,6 +360,7 @@ export default function GitHubWallpaperApp() {
                   </label>
                   <TextInput
                     id="github-handle"
+                    disabled={!isHydrated}
                     value={username}
                     onChange={(value) => {
                       setUsername(value);
@@ -373,7 +379,7 @@ export default function GitHubWallpaperApp() {
                 {(!hasSubmitted || loading) && (
                   <PrimaryButton
                     type="submit"
-                    disabled={loading}
+                    disabled={!isHydrated || loading}
                     fullWidth={true}
                     size="large"
                   >
