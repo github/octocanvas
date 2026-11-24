@@ -5,6 +5,66 @@ const avatar = Buffer.from(
   "base64",
 );
 
+test("banner avatar styles render locally without disclosing profile lookups to an image proxy", async ({
+  page,
+}) => {
+  const proxyRequests: string[] = [];
+  await page.route("https://images.weserv.nl/**", (route) => {
+    proxyRequests.push(route.request().url());
+    return route.fulfill({ contentType: "image/png", body: avatar });
+  });
+  await page.route("https://api.github.com/users/octocat", (route) =>
+    route.fulfill({
+      json: {
+        login: "octocat",
+        name: "The Octocat",
+        avatar_url: "https://avatars.githubusercontent.com/u/583231",
+        followers: 1234,
+        public_repos: 8,
+        created_at: "2011-01-25T18:44:36Z",
+      },
+    }),
+  );
+  await page.route("https://github.com/octocat.contribs", (route) =>
+    route.fulfill({ json: { total_contributions: 42, weeks: [] } }),
+  );
+  await page.route("https://api.github.com/users/octocat/repos?*", (route) =>
+    route.fulfill({ json: [] }),
+  );
+  await page.route("https://avatars.githubusercontent.com/**", (route) =>
+    route.fulfill({ contentType: "image/png", body: avatar }),
+  );
+
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  const input = page.getByLabel("GitHub Username");
+  await input.click();
+  await input.pressSequentially("octocat");
+  await expect(input).toHaveValue("octocat");
+  await page.getByRole("button", { name: "Generate" }).click();
+  await expect(page.getByText("Your Wallpaper", { exact: true })).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  expect(proxyRequests).toEqual([]);
+
+  await page.getByRole("tab", { name: "README Banner" }).click();
+  for (const [style, alt] of [
+    ["pixel", "Pixel Art Avatar"],
+    ["grayscale", "Grayscale Avatar"],
+    ["color", "Color Avatar"],
+  ]) {
+    await page.getByLabel("Avatar Style", { exact: true }).selectOption(style);
+    const image = page.getByRole("img", { name: alt, exact: true });
+    await expect(image).toBeVisible();
+    await expect(image).toHaveAttribute("src", /^data:image\/png;base64,/);
+    await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+  }
+  await page.getByLabel("Avatar Style", { exact: true }).selectOption("ascii");
+  await expect(page.locator("pre")).toBeVisible();
+  await expect(page.locator("pre")).toContainText(/\S/);
+  await page.waitForLoadState("networkidle");
+  expect(proxyRequests).toEqual([]);
+});
+
 for (const [platform, origin] of [
   ["Twitter/X", "https://twitter.com"],
   ["Bluesky", "https://bsky.app"],
