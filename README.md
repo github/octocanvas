@@ -67,6 +67,12 @@ A static web application that creates GitHub-themed collectibles from GitHub pro
 - 📱 **Mobile Responsive**: Optimized for desktop, tablet, and mobile devices
 - 🎯 **Easily Extensible**: Well-structured TypeScript code for adding features
 
+### Avatar privacy
+
+Avatars are loaded directly from GitHub's avatar CDN. README banner ASCII,
+pixel, grayscale, and color art is generated locally in the browser; avatar URLs
+and profile lookups are not sent to a third-party image proxy.
+
 ## 🚀 Quick Start
 
 ### Prerequisites

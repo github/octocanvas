@@ -255,10 +255,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
           resolve("");
         };
 
-        // Use CORS proxy for avatar
-        img.src = `https://images.weserv.nl/?url=${encodeURIComponent(
-          imageUrl
-        )}&w=200&h=200&fit=cover&a=attention`;
+        img.src = imageUrl;
       });
     };
 
@@ -303,10 +300,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
           resolve("");
         };
 
-        // Use CORS proxy for avatar
-        img.src = `https://images.weserv.nl/?url=${encodeURIComponent(
-          imageUrl
-        )}&w=200&h=200&fit=cover&a=attention`;
+        img.src = imageUrl;
       });
     };
 
@@ -359,10 +353,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
           resolve("");
         };
 
-        // Use CORS proxy for avatar
-        img.src = `https://images.weserv.nl/?url=${encodeURIComponent(
-          imageUrl
-        )}&w=256&h=256&fit=cover&a=attention`;
+        img.src = imageUrl;
       });
     };
 
@@ -397,10 +388,7 @@ const ReadmeBanner = forwardRef<ReadmeBannerRef, ReadmeBannerProps>(
           resolve("");
         };
 
-        // Use CORS proxy for avatar
-        img.src = `https://images.weserv.nl/?url=${encodeURIComponent(
-          imageUrl
-        )}&w=256&h=256&fit=cover&a=attention`;
+        img.src = imageUrl;
       });
     };
     /**
